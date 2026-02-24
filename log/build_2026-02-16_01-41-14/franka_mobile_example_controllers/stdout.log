@@ -1,0 +1,27 @@
+[100%] Built target franka_mobile_example_controllers
+-- Install configuration: ""
+-- Execute custom install script
+-- Up-to-date symlink: /home/raiaan/franka_ros2_ws/install/franka_mobile_example_controllers/share/franka_mobile_example_controllers//franka_mobile_example_controllers.xml
+-- Up-to-date symlink: /home/raiaan/franka_ros2_ws/install/franka_mobile_example_controllers/lib/libfranka_mobile_example_controllers.so
+-- Up-to-date symlink: /home/raiaan/franka_ros2_ws/install/franka_mobile_example_controllers/include/franka_mobile_example_controllers/mobile_cartesian_velocity_example_controller.hpp
+-- Up-to-date symlink: /home/raiaan/franka_ros2_ws/install/franka_mobile_example_controllers/share/franka_mobile_example_controllers/environment/library_path.sh
+-- Up-to-date symlink: /home/raiaan/franka_ros2_ws/install/franka_mobile_example_controllers/share/franka_mobile_example_controllers/environment/library_path.dsv
+-- Up-to-date symlink: /home/raiaan/franka_ros2_ws/install/franka_mobile_example_controllers/share/ament_index/resource_index/package_run_dependencies/franka_mobile_example_controllers
+-- Up-to-date symlink: /home/raiaan/franka_ros2_ws/install/franka_mobile_example_controllers/share/ament_index/resource_index/parent_prefix_path/franka_mobile_example_controllers
+-- Up-to-date symlink: /home/raiaan/franka_ros2_ws/install/franka_mobile_example_controllers/share/franka_mobile_example_controllers/environment/ament_prefix_path.sh
+-- Up-to-date symlink: /home/raiaan/franka_ros2_ws/install/franka_mobile_example_controllers/share/franka_mobile_example_controllers/environment/ament_prefix_path.dsv
+-- Up-to-date symlink: /home/raiaan/franka_ros2_ws/install/franka_mobile_example_controllers/share/franka_mobile_example_controllers/environment/path.sh
+-- Up-to-date symlink: /home/raiaan/franka_ros2_ws/install/franka_mobile_example_controllers/share/franka_mobile_example_controllers/environment/path.dsv
+-- Up-to-date symlink: /home/raiaan/franka_ros2_ws/install/franka_mobile_example_controllers/share/franka_mobile_example_controllers/local_setup.bash
+-- Up-to-date symlink: /home/raiaan/franka_ros2_ws/install/franka_mobile_example_controllers/share/franka_mobile_example_controllers/local_setup.sh
+-- Up-to-date symlink: /home/raiaan/franka_ros2_ws/install/franka_mobile_example_controllers/share/franka_mobile_example_controllers/local_setup.zsh
+-- Up-to-date symlink: /home/raiaan/franka_ros2_ws/install/franka_mobile_example_controllers/share/franka_mobile_example_controllers/local_setup.dsv
+-- Symlinking: /home/raiaan/franka_ros2_ws/install/franka_mobile_example_controllers/share/franka_mobile_example_controllers/package.dsv
+-- Up-to-date symlink: /home/raiaan/franka_ros2_ws/install/franka_mobile_example_controllers/share/ament_index/resource_index/packages/franka_mobile_example_controllers
+-- Up-to-date symlink: /home/raiaan/franka_ros2_ws/install/franka_mobile_example_controllers/share/ament_index/resource_index/controller_interface__pluginlib__plugin/franka_mobile_example_controllers
+-- Up-to-date symlink: /home/raiaan/franka_ros2_ws/install/franka_mobile_example_controllers/share/franka_mobile_example_controllers/cmake/ament_cmake_export_include_directories-extras.cmake
+-- Up-to-date symlink: /home/raiaan/franka_ros2_ws/install/franka_mobile_example_controllers/share/franka_mobile_example_controllers/cmake/ament_cmake_export_libraries-extras.cmake
+-- Up-to-date symlink: /home/raiaan/franka_ros2_ws/install/franka_mobile_example_controllers/share/franka_mobile_example_controllers/cmake/ament_cmake_export_dependencies-extras.cmake
+-- Up-to-date symlink: /home/raiaan/franka_ros2_ws/install/franka_mobile_example_controllers/share/franka_mobile_example_controllers/cmake/franka_mobile_example_controllersConfig.cmake
+-- Up-to-date symlink: /home/raiaan/franka_ros2_ws/install/franka_mobile_example_controllers/share/franka_mobile_example_controllers/cmake/franka_mobile_example_controllersConfig-version.cmake
+-- Up-to-date symlink: /home/raiaan/franka_ros2_ws/install/franka_mobile_example_controllers/share/franka_mobile_example_controllers/package.xml

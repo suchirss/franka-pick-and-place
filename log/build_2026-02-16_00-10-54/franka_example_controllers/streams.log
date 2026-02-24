@@ -1,0 +1,144 @@
+[2.425s] Invoking command in '/home/raiaan/franka_ros2_ws/build/franka_example_controllers': CMAKE_PREFIX_PATH=/home/raiaan/franka_ros2_ws/install/franka_semantic_components:/home/raiaan/franka_ros2_ws/install/franka_hardware:/home/raiaan/franka_ros2_ws/install/libfranka:/home/raiaan/franka_ros2_ws/install/franka_msgs:/home/raiaan/franka_ros2_ws/install/franka_ros2:/home/raiaan/franka_ros2_ws/install/franka_bringup:/home/raiaan/franka_ros2_ws/install/franka_robot_state_broadcaster:/home/raiaan/franka_ros2_ws/install/franka_mobile_example_controllers:/home/raiaan/franka_ros2_ws/install/franka_example_controllers:/home/raiaan/franka_ros2_ws/install/franka_gazebo_bringup:/home/raiaan/franka_ros2_ws/install/franka_ign_ros2_control:/home/raiaan/franka_ros2_ws/install/franka_fr3_moveit_config:/home/raiaan/franka_ros2_ws/install/franka_gripper:/home/raiaan/franka_ros2_ws/install/integration_launch_testing:/home/raiaan/franka_ros2_ws/install/franka_description:/opt/ros/humble LD_LIBRARY_PATH=/home/raiaan/franka_ros2_ws/install/franka_semantic_components/lib:/home/raiaan/franka_ros2_ws/install/franka_hardware/lib:/home/raiaan/franka_ros2_ws/install/libfranka/lib:/home/raiaan/franka_ros2_ws/install/franka_msgs/lib:/home/raiaan/franka_ros2_ws/install/franka_robot_state_broadcaster/lib:/home/raiaan/franka_ros2_ws/install/franka_mobile_example_controllers/lib:/home/raiaan/franka_ros2_ws/install/franka_example_controllers/lib:/home/raiaan/franka_ros2_ws/install/franka_ign_ros2_control/lib:/home/raiaan/franka_ros2_ws/install/franka_gripper/lib:/home/raiaan/franka_ros2_ws/install/integration_launch_testing/lib:/opt/ros/humble/opt/rviz_ogre_vendor/lib:/opt/ros/humble/lib/x86_64-linux-gnu:/opt/ros/humble/lib /usr/bin/cmake --build /home/raiaan/franka_ros2_ws/build/franka_example_controllers -- -j6 -l6
+[2.463s] -- Found ament_cmake: 1.3.12 (/opt/ros/humble/share/ament_cmake/cmake)
+[2.509s] -- Found Python3: /usr/bin/python3 (found version "3.10.12") found components: Interpreter 
+[2.562s] -- Override CMake install command with custom implementation using symlinks instead of copying resources
+[2.569s] -- Found ament_index_cpp: 1.4.0 (/opt/ros/humble/share/ament_index_cpp/cmake)
+[2.569s] -- Found controller_interface: 2.53.0 (/opt/ros/humble/share/controller_interface/cmake)
+[3.129s] -- Found rosidl_generator_c: 3.1.8 (/opt/ros/humble/share/rosidl_generator_c/cmake)
+[3.130s] -- Found rosidl_adapter: 3.1.8 (/opt/ros/humble/share/rosidl_adapter/cmake)
+[3.135s] -- Found rosidl_generator_cpp: 3.1.8 (/opt/ros/humble/share/rosidl_generator_cpp/cmake)
+[3.149s] -- Using all available rosidl_typesupport_c: rosidl_typesupport_fastrtps_c;rosidl_typesupport_introspection_c
+[3.161s] -- Using all available rosidl_typesupport_cpp: rosidl_typesupport_fastrtps_cpp;rosidl_typesupport_introspection_cpp
+[9.109s] -- Found rmw_implementation_cmake: 6.1.2 (/opt/ros/humble/share/rmw_implementation_cmake/cmake)
+[9.110s] -- Found rmw_fastrtps_cpp: 6.2.9 (/opt/ros/humble/share/rmw_fastrtps_cpp/cmake)
+[9.124s] -- Found TinyXML2 via Config file: TinyXML2_DIR-NOTFOUND
+[9.133s] -- Found TinyXML2 via Config file: TinyXML2_DIR-NOTFOUND
+[9.537s] -- Found TinyXML2 via Config file: TinyXML2_DIR-NOTFOUND
+[9.544s] -- Found TinyXML2 via Config file: TinyXML2_DIR-NOTFOUND
+[10.073s] -- Using RMW implementation 'rmw_fastrtps_cpp' as default
+[10.109s] -- Found franka_msgs: 2.2.0 (/home/raiaan/franka_ros2_ws/install/franka_msgs/share/franka_msgs/cmake)
+[10.125s] -- Found franka_semantic_components: 2.2.0 (/home/raiaan/franka_ros2_ws/install/franka_semantic_components/share/franka_semantic_components/cmake)
+[10.141s] -- Found moveit_core: 2.5.9 (/opt/ros/humble/share/moveit_core/cmake)
+[10.174s] -- Found Boost: /usr/lib/x86_64-linux-gnu/cmake/Boost-1.74.0/BoostConfig.cmake (found version "1.74.0") found components: chrono date_time filesystem iostreams program_options regex serialization system thread 
+[14.874s] -- Found parameter_traits: 0.6.0 (/opt/ros/humble/share/parameter_traits/cmake)
+[14.885s] -- Found Boost: /usr/lib/x86_64-linux-gnu/cmake/Boost-1.74.0/BoostConfig.cmake (found version "1.74.0") found components: filesystem 
+[21.557s] -- library: /usr/lib/x86_64-linux-gnu/libcurl.so
+[21.607s] -- Ensuring Eigen3 include directory is part of orocos-kdl CMake target
+[21.775s] -- pinocchio_default FOUND. pinocchio_default at /opt/ros/humble/lib/x86_64-linux-gnu/libpinocchio_default.so
+[21.775s] -- pinocchio_parsers FOUND. pinocchio_parsers at /opt/ros/humble/lib/x86_64-linux-gnu/libpinocchio_parsers.so
+[21.776s] -- boost_filesystem FOUND. boost_filesystem at /lib/x86_64-linux-gnu/libboost_filesystem.so
+[21.782s] -- Found Boost: /usr/include (found version "1.74.0") found components: filesystem serialization system 
+[21.783s] -- eigenpy FOUND. eigenpy at /opt/ros/humble/lib/x86_64-linux-gnu/libeigenpy.so
+[21.806s] -- Checking for NumPy
+[21.985s] --   NUMPY_INCLUDE_DIRS=/usr/lib/python3/dist-packages/numpy/core/include
+[22.072s] --   NUMPY_VERSION=1.21.5
+[22.292s] -- Found Python3: /usr/bin/python3 (found version "3.10.12") found components: Interpreter Development.Module NumPy 
+[22.292s] -- PythonLibraryDirs: 
+[22.292s] -- PythonLibVersionString: 3.10.12
+[22.309s] -- Python site lib: lib/python3.10/site-packages
+[22.309s] -- Python include dirs: /usr/include/python3.10
+[22.344s] -- Checking for NumPy
+[22.430s] --   NUMPY_INCLUDE_DIRS=/usr/lib/python3/dist-packages/numpy/core/include
+[22.516s] --   NUMPY_VERSION=1.21.5
+[22.516s] -- NumPy include dir: /usr/lib/python3/dist-packages/numpy/core/include
+[22.520s] [33mCMake Warning at /usr/share/cmake-3.22/Modules/FindBoost.cmake:2201 (message):
+[22.520s]   No header defined for python310; skipping header check (note: header-only
+[22.520s]   libraries have no designated component)
+[22.520s] Call Stack (most recent call first):
+[22.520s]   /opt/ros/humble/lib/x86_64-linux-gnu/cmake/eigenpy/boost.cmake:148 (find_package)
+[22.520s]   /opt/ros/humble/lib/x86_64-linux-gnu/cmake/eigenpy/eigenpyConfig.cmake:149 (SEARCH_FOR_BOOST_PYTHON)
+[22.521s]   /usr/share/cmake-3.22/Modules/CMakeFindDependencyMacro.cmake:47 (find_package)
+[22.521s]   /opt/ros/humble/lib/x86_64-linux-gnu/cmake/pinocchio/pinocchioConfig.cmake:161 (find_dependency)
+[22.521s]   CMakeLists.txt:25 (find_package)
+[22.521s] 
+[22.521s] [0m
+[22.521s] -- Found Boost: /usr/include (found version "1.74.0") found components: python310 
+[23.348s] -- Default C++ standard: 201703
+[23.348s] -- C++ standard sufficient: Minimal required 11, currently defined: 17
+[23.350s] -- hpp-fcl FOUND. hpp-fcl at /opt/ros/humble/lib/x86_64-linux-gnu/libhpp-fcl.so
+[23.357s] -- Found Boost: /usr/include (found version "1.74.0") found components: chrono serialization filesystem 
+[23.358s] -- C++ standard sufficient: Minimal required 11, currently defined: 17
+[23.359s] -- C++ standard sufficient: Minimal required 11, currently defined: 17
+[23.360s] -- Found std_srvs: 4.9.0 (/opt/ros/humble/share/std_srvs/cmake)
+[23.386s] -- Found ament_cmake_clang_format: 0.12.14 (/opt/ros/humble/share/ament_cmake_clang_format/cmake)
+[23.386s] -- Found ament_cmake_copyright: 0.12.14 (/opt/ros/humble/share/ament_cmake_copyright/cmake)
+[23.386s] -- Found ament_cmake_cppcheck: 0.12.14 (/opt/ros/humble/share/ament_cmake_cppcheck/cmake)
+[23.387s] -- Found ament_cmake_flake8: 0.12.14 (/opt/ros/humble/share/ament_cmake_flake8/cmake)
+[23.387s] -- Found ament_cmake_lint_cmake: 0.12.14 (/opt/ros/humble/share/ament_cmake_lint_cmake/cmake)
+[23.388s] -- Found ament_cmake_pep257: 0.12.14 (/opt/ros/humble/share/ament_cmake_pep257/cmake)
+[23.388s] -- Found ament_cmake_xmllint: 0.12.14 (/opt/ros/humble/share/ament_cmake_xmllint/cmake)
+[23.388s] -- Found ament_cmake_gmock: 1.3.12 (/opt/ros/humble/share/ament_cmake_gmock/cmake)
+[23.389s] -- Found controller_manager: 2.53.0 (/opt/ros/humble/share/controller_manager/cmake)
+[23.405s] -- Found ros2_control_test_assets: 2.53.0 (/opt/ros/humble/share/ros2_control_test_assets/cmake)
+[23.407s] -- Found gmock sources under '/opt/ros/humble/src/gmock_vendor': C++ tests using 'Google Mock' will be built
+[23.410s] -- Found ament_cmake_gtest: 1.3.12 (/opt/ros/humble/share/ament_cmake_gtest/cmake)
+[23.410s] -- Found gtest sources under '/opt/ros/humble/src/gtest_vendor': C++ tests using 'Google Test' will be built
+[23.485s] -- Configuring done
+[23.604s] -- Generating done
+[23.628s] -- Build files have been written to: /home/raiaan/franka_ros2_ws/build/franka_example_controllers
+[23.664s] [35m[1mConsolidate compiler generated dependencies of target gmock_main[0m
+[23.665s] [35m[1mConsolidate compiler generated dependencies of target ptp_motion_example_node[0m
+[23.665s] [35m[1mConsolidate compiler generated dependencies of target gmock[0m
+[23.675s] [  6%] Built target gmock_main
+[23.678s] [ 16%] Built target gmock
+[23.679s] [ 23%] Built target ptp_motion_example_node
+[23.686s] [35m[1mConsolidate compiler generated dependencies of target franka_example_controllers[0m
+[23.688s] [35m[1mConsolidate compiler generated dependencies of target franka_example_controllers_test[0m
+[23.688s] [35m[1mConsolidate compiler generated dependencies of target franka_example_controllers_test_load_move_to_start[0m
+[23.703s] [ 30%] Built target franka_example_controllers_test_load_move_to_start
+[23.703s] [ 36%] Built target franka_example_controllers_test
+[23.730s] [ 40%] [32m[1mLinking CXX shared library libfranka_example_controllers.so[0m
+[25.465s] [ 86%] Built target franka_example_controllers
+[25.477s] [35m[1mConsolidate compiler generated dependencies of target franka_example_controllers_gravity_test[0m
+[25.477s] [35m[1mConsolidate compiler generated dependencies of target franka_example_controllers_move_to_start_test[0m
+[25.492s] [ 90%] [32m[1mLinking CXX executable franka_example_controllers_gravity_test[0m
+[25.495s] [ 93%] [32m[1mLinking CXX executable franka_example_controllers_move_to_start_test[0m
+[26.645s] [100%] Built target franka_example_controllers_gravity_test
+[26.645s] [100%] Built target franka_example_controllers_move_to_start_test
+[26.655s] Invoked command in '/home/raiaan/franka_ros2_ws/build/franka_example_controllers' returned '0': CMAKE_PREFIX_PATH=/home/raiaan/franka_ros2_ws/install/franka_semantic_components:/home/raiaan/franka_ros2_ws/install/franka_hardware:/home/raiaan/franka_ros2_ws/install/libfranka:/home/raiaan/franka_ros2_ws/install/franka_msgs:/home/raiaan/franka_ros2_ws/install/franka_ros2:/home/raiaan/franka_ros2_ws/install/franka_bringup:/home/raiaan/franka_ros2_ws/install/franka_robot_state_broadcaster:/home/raiaan/franka_ros2_ws/install/franka_mobile_example_controllers:/home/raiaan/franka_ros2_ws/install/franka_example_controllers:/home/raiaan/franka_ros2_ws/install/franka_gazebo_bringup:/home/raiaan/franka_ros2_ws/install/franka_ign_ros2_control:/home/raiaan/franka_ros2_ws/install/franka_fr3_moveit_config:/home/raiaan/franka_ros2_ws/install/franka_gripper:/home/raiaan/franka_ros2_ws/install/integration_launch_testing:/home/raiaan/franka_ros2_ws/install/franka_description:/opt/ros/humble LD_LIBRARY_PATH=/home/raiaan/franka_ros2_ws/install/franka_semantic_components/lib:/home/raiaan/franka_ros2_ws/install/franka_hardware/lib:/home/raiaan/franka_ros2_ws/install/libfranka/lib:/home/raiaan/franka_ros2_ws/install/franka_msgs/lib:/home/raiaan/franka_ros2_ws/install/franka_robot_state_broadcaster/lib:/home/raiaan/franka_ros2_ws/install/franka_mobile_example_controllers/lib:/home/raiaan/franka_ros2_ws/install/franka_example_controllers/lib:/home/raiaan/franka_ros2_ws/install/franka_ign_ros2_control/lib:/home/raiaan/franka_ros2_ws/install/franka_gripper/lib:/home/raiaan/franka_ros2_ws/install/integration_launch_testing/lib:/opt/ros/humble/opt/rviz_ogre_vendor/lib:/opt/ros/humble/lib/x86_64-linux-gnu:/opt/ros/humble/lib /usr/bin/cmake --build /home/raiaan/franka_ros2_ws/build/franka_example_controllers -- -j6 -l6
+[26.658s] Invoking command in '/home/raiaan/franka_ros2_ws/build/franka_example_controllers': CMAKE_PREFIX_PATH=/home/raiaan/franka_ros2_ws/install/franka_semantic_components:/home/raiaan/franka_ros2_ws/install/franka_hardware:/home/raiaan/franka_ros2_ws/install/libfranka:/home/raiaan/franka_ros2_ws/install/franka_msgs:/home/raiaan/franka_ros2_ws/install/franka_ros2:/home/raiaan/franka_ros2_ws/install/franka_bringup:/home/raiaan/franka_ros2_ws/install/franka_robot_state_broadcaster:/home/raiaan/franka_ros2_ws/install/franka_mobile_example_controllers:/home/raiaan/franka_ros2_ws/install/franka_example_controllers:/home/raiaan/franka_ros2_ws/install/franka_gazebo_bringup:/home/raiaan/franka_ros2_ws/install/franka_ign_ros2_control:/home/raiaan/franka_ros2_ws/install/franka_fr3_moveit_config:/home/raiaan/franka_ros2_ws/install/franka_gripper:/home/raiaan/franka_ros2_ws/install/integration_launch_testing:/home/raiaan/franka_ros2_ws/install/franka_description:/opt/ros/humble LD_LIBRARY_PATH=/home/raiaan/franka_ros2_ws/install/franka_semantic_components/lib:/home/raiaan/franka_ros2_ws/install/franka_hardware/lib:/home/raiaan/franka_ros2_ws/install/libfranka/lib:/home/raiaan/franka_ros2_ws/install/franka_msgs/lib:/home/raiaan/franka_ros2_ws/install/franka_robot_state_broadcaster/lib:/home/raiaan/franka_ros2_ws/install/franka_mobile_example_controllers/lib:/home/raiaan/franka_ros2_ws/install/franka_example_controllers/lib:/home/raiaan/franka_ros2_ws/install/franka_ign_ros2_control/lib:/home/raiaan/franka_ros2_ws/install/franka_gripper/lib:/home/raiaan/franka_ros2_ws/install/integration_launch_testing/lib:/opt/ros/humble/opt/rviz_ogre_vendor/lib:/opt/ros/humble/lib/x86_64-linux-gnu:/opt/ros/humble/lib /usr/bin/cmake --install /home/raiaan/franka_ros2_ws/build/franka_example_controllers
+[26.665s] -- Install configuration: ""
+[26.665s] -- Execute custom install script
+[26.666s] -- Up-to-date symlink: /home/raiaan/franka_ros2_ws/install/franka_example_controllers/share/franka_example_controllers//franka_example_controllers.xml
+[26.666s] -- Up-to-date symlink: /home/raiaan/franka_ros2_ws/install/franka_example_controllers/lib/libfranka_example_controllers.so
+[26.668s] -- Up-to-date symlink: /home/raiaan/franka_ros2_ws/install/franka_example_controllers/include/franka_example_controllers/async_motions/ptp_motion_example_node.hpp
+[26.668s] -- Up-to-date symlink: /home/raiaan/franka_ros2_ws/install/franka_example_controllers/include/franka_example_controllers/cartesian_elbow_example_controller.hpp
+[26.668s] -- Up-to-date symlink: /home/raiaan/franka_ros2_ws/install/franka_example_controllers/include/franka_example_controllers/cartesian_orientation_example_controller.hpp
+[26.669s] -- Up-to-date symlink: /home/raiaan/franka_ros2_ws/install/franka_example_controllers/include/franka_example_controllers/cartesian_pose_example_controller.hpp
+[26.669s] -- Up-to-date symlink: /home/raiaan/franka_ros2_ws/install/franka_example_controllers/include/franka_example_controllers/cartesian_velocity_example_controller.hpp
+[26.670s] -- Up-to-date symlink: /home/raiaan/franka_ros2_ws/install/franka_example_controllers/include/franka_example_controllers/default_robot_behavior_utils.hpp
+[26.670s] -- Up-to-date symlink: /home/raiaan/franka_ros2_ws/install/franka_example_controllers/include/franka_example_controllers/elbow_example_controller.hpp
+[26.670s] -- Up-to-date symlink: /home/raiaan/franka_ros2_ws/install/franka_example_controllers/include/franka_example_controllers/gravity_compensation_example_controller.hpp
+[26.671s] -- Up-to-date symlink: /home/raiaan/franka_ros2_ws/install/franka_example_controllers/include/franka_example_controllers/gripper_example_controller.hpp
+[26.671s] -- Up-to-date symlink: /home/raiaan/franka_ros2_ws/install/franka_example_controllers/include/franka_example_controllers/joint_impedance_example_controller.hpp
+[26.671s] -- Up-to-date symlink: /home/raiaan/franka_ros2_ws/install/franka_example_controllers/include/franka_example_controllers/joint_impedance_with_ik_example_controller.hpp
+[26.672s] -- Up-to-date symlink: /home/raiaan/franka_ros2_ws/install/franka_example_controllers/include/franka_example_controllers/joint_position_example_controller.hpp
+[26.672s] -- Up-to-date symlink: /home/raiaan/franka_ros2_ws/install/franka_example_controllers/include/franka_example_controllers/joint_velocity_example_controller.hpp
+[26.672s] -- Up-to-date symlink: /home/raiaan/franka_ros2_ws/install/franka_example_controllers/include/franka_example_controllers/model_example_controller.hpp
+[26.672s] -- Up-to-date symlink: /home/raiaan/franka_ros2_ws/install/franka_example_controllers/include/franka_example_controllers/motion_generator.hpp
+[26.673s] -- Up-to-date symlink: /home/raiaan/franka_ros2_ws/install/franka_example_controllers/include/franka_example_controllers/move_to_start_example_controller.hpp
+[26.673s] -- Up-to-date symlink: /home/raiaan/franka_ros2_ws/install/franka_example_controllers/include/franka_example_controllers/robot_utils.hpp
+[26.673s] -- Up-to-date symlink: /home/raiaan/franka_ros2_ws/install/franka_example_controllers/include/franka_example_controllers/visibility_control.h
+[26.674s] -- Up-to-date symlink: /home/raiaan/franka_ros2_ws/install/franka_example_controllers/lib/franka_example_controllers/ptp_motion_example_node
+[26.675s] -- Up-to-date symlink: /home/raiaan/franka_ros2_ws/install/franka_example_controllers/share/franka_example_controllers/environment/library_path.sh
+[26.675s] -- Up-to-date symlink: /home/raiaan/franka_ros2_ws/install/franka_example_controllers/share/franka_example_controllers/environment/library_path.dsv
+[26.675s] -- Up-to-date symlink: /home/raiaan/franka_ros2_ws/install/franka_example_controllers/share/ament_index/resource_index/package_run_dependencies/franka_example_controllers
+[26.675s] -- Up-to-date symlink: /home/raiaan/franka_ros2_ws/install/franka_example_controllers/share/ament_index/resource_index/parent_prefix_path/franka_example_controllers
+[26.676s] -- Up-to-date symlink: /home/raiaan/franka_ros2_ws/install/franka_example_controllers/share/franka_example_controllers/environment/ament_prefix_path.sh
+[26.676s] -- Up-to-date symlink: /home/raiaan/franka_ros2_ws/install/franka_example_controllers/share/franka_example_controllers/environment/ament_prefix_path.dsv
+[26.677s] -- Up-to-date symlink: /home/raiaan/franka_ros2_ws/install/franka_example_controllers/share/franka_example_controllers/environment/path.sh
+[26.677s] -- Up-to-date symlink: /home/raiaan/franka_ros2_ws/install/franka_example_controllers/share/franka_example_controllers/environment/path.dsv
+[26.677s] -- Up-to-date symlink: /home/raiaan/franka_ros2_ws/install/franka_example_controllers/share/franka_example_controllers/local_setup.bash
+[26.678s] -- Up-to-date symlink: /home/raiaan/franka_ros2_ws/install/franka_example_controllers/share/franka_example_controllers/local_setup.sh
+[26.678s] -- Up-to-date symlink: /home/raiaan/franka_ros2_ws/install/franka_example_controllers/share/franka_example_controllers/local_setup.zsh
+[26.679s] -- Up-to-date symlink: /home/raiaan/franka_ros2_ws/install/franka_example_controllers/share/franka_example_controllers/local_setup.dsv
+[26.679s] -- Symlinking: /home/raiaan/franka_ros2_ws/install/franka_example_controllers/share/franka_example_controllers/package.dsv
+[26.688s] -- Up-to-date symlink: /home/raiaan/franka_ros2_ws/install/franka_example_controllers/share/ament_index/resource_index/packages/franka_example_controllers
+[26.689s] -- Up-to-date symlink: /home/raiaan/franka_ros2_ws/install/franka_example_controllers/share/ament_index/resource_index/controller_interface__pluginlib__plugin/franka_example_controllers
+[26.689s] -- Up-to-date symlink: /home/raiaan/franka_ros2_ws/install/franka_example_controllers/share/franka_example_controllers/cmake/ament_cmake_export_include_directories-extras.cmake
+[26.690s] -- Up-to-date symlink: /home/raiaan/franka_ros2_ws/install/franka_example_controllers/share/franka_example_controllers/cmake/ament_cmake_export_libraries-extras.cmake
+[26.690s] -- Up-to-date symlink: /home/raiaan/franka_ros2_ws/install/franka_example_controllers/share/franka_example_controllers/cmake/ament_cmake_export_dependencies-extras.cmake
+[26.691s] -- Up-to-date symlink: /home/raiaan/franka_ros2_ws/install/franka_example_controllers/share/franka_example_controllers/cmake/franka_example_controllersConfig.cmake
+[26.691s] -- Up-to-date symlink: /home/raiaan/franka_ros2_ws/install/franka_example_controllers/share/franka_example_controllers/cmake/franka_example_controllersConfig-version.cmake
+[26.692s] -- Up-to-date symlink: /home/raiaan/franka_ros2_ws/install/franka_example_controllers/share/franka_example_controllers/package.xml
+[26.694s] Invoked command in '/home/raiaan/franka_ros2_ws/build/franka_example_controllers' returned '0': CMAKE_PREFIX_PATH=/home/raiaan/franka_ros2_ws/install/franka_semantic_components:/home/raiaan/franka_ros2_ws/install/franka_hardware:/home/raiaan/franka_ros2_ws/install/libfranka:/home/raiaan/franka_ros2_ws/install/franka_msgs:/home/raiaan/franka_ros2_ws/install/franka_ros2:/home/raiaan/franka_ros2_ws/install/franka_bringup:/home/raiaan/franka_ros2_ws/install/franka_robot_state_broadcaster:/home/raiaan/franka_ros2_ws/install/franka_mobile_example_controllers:/home/raiaan/franka_ros2_ws/install/franka_example_controllers:/home/raiaan/franka_ros2_ws/install/franka_gazebo_bringup:/home/raiaan/franka_ros2_ws/install/franka_ign_ros2_control:/home/raiaan/franka_ros2_ws/install/franka_fr3_moveit_config:/home/raiaan/franka_ros2_ws/install/franka_gripper:/home/raiaan/franka_ros2_ws/install/integration_launch_testing:/home/raiaan/franka_ros2_ws/install/franka_description:/opt/ros/humble LD_LIBRARY_PATH=/home/raiaan/franka_ros2_ws/install/franka_semantic_components/lib:/home/raiaan/franka_ros2_ws/install/franka_hardware/lib:/home/raiaan/franka_ros2_ws/install/libfranka/lib:/home/raiaan/franka_ros2_ws/install/franka_msgs/lib:/home/raiaan/franka_ros2_ws/install/franka_robot_state_broadcaster/lib:/home/raiaan/franka_ros2_ws/install/franka_mobile_example_controllers/lib:/home/raiaan/franka_ros2_ws/install/franka_example_controllers/lib:/home/raiaan/franka_ros2_ws/install/franka_ign_ros2_control/lib:/home/raiaan/franka_ros2_ws/install/franka_gripper/lib:/home/raiaan/franka_ros2_ws/install/integration_launch_testing/lib:/opt/ros/humble/opt/rviz_ogre_vendor/lib:/opt/ros/humble/lib/x86_64-linux-gnu:/opt/ros/humble/lib /usr/bin/cmake --install /home/raiaan/franka_ros2_ws/build/franka_example_controllers

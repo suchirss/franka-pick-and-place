@@ -1,0 +1,260 @@
+[0.031s] Invoking command in '/home/raiaan/franka_ros2_ws/build/libfranka': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/opt/ros/humble /usr/bin/cmake /home/raiaan/franka_ros2_ws/src/libfranka -DBUILD_TESTS=OFF -DCMAKE_INSTALL_PREFIX=/home/raiaan/franka_ros2_ws/install/libfranka
+[1.285s] -- The CXX compiler identification is GNU 11.4.0
+[4.301s] -- Detecting CXX compiler ABI info
+[5.113s] -- Detecting CXX compiler ABI info - done
+[5.122s] -- Check for working CXX compiler: /usr/bin/c++ - skipped
+[5.124s] -- Detecting CXX compile features
+[5.125s] -- Detecting CXX compile features - done
+[5.126s] -- Setting build type to 'Release' as none was specified.
+[5.203s] -- Found Eigen3: /usr/include/eigen3  
+[14.146s] -- pinocchio_default FOUND. pinocchio_default at /opt/ros/humble/lib/x86_64-linux-gnu/libpinocchio_default.so
+[14.147s] -- pinocchio_parsers FOUND. pinocchio_parsers at /opt/ros/humble/lib/x86_64-linux-gnu/libpinocchio_parsers.so
+[14.149s] -- boost_filesystem FOUND. boost_filesystem at /lib/x86_64-linux-gnu/libboost_filesystem.so
+[130.359s] -- Found Boost: /usr/include (found version "1.74.0") found components: filesystem serialization system 
+[130.374s] -- eigenpy FOUND. eigenpy at /opt/ros/humble/lib/x86_64-linux-gnu/libeigenpy.so
+[221.799s] -- PythonLibraryDirs: 
+[221.799s] -- PythonLibVersionString: 3.10.12
+[221.816s] -- Python site lib: lib/python3.10/site-packages
+[221.816s] -- Python include dirs: /usr/include/python3.10
+[221.851s] -- Checking for NumPy
+[221.940s] --   NUMPY_INCLUDE_DIRS=/usr/lib/python3/dist-packages/numpy/core/include
+[222.027s] --   NUMPY_VERSION=1.21.5
+[222.027s] -- NumPy include dir: /usr/lib/python3/dist-packages/numpy/core/include
+[222.032s] [33mCMake Warning at /usr/share/cmake-3.22/Modules/FindBoost.cmake:2201 (message):
+[222.032s]   No header defined for python310; skipping header check (note: header-only
+[222.032s]   libraries have no designated component)
+[222.032s] Call Stack (most recent call first):
+[222.032s]   /opt/ros/humble/lib/x86_64-linux-gnu/cmake/eigenpy/boost.cmake:148 (find_package)
+[222.032s]   /opt/ros/humble/lib/x86_64-linux-gnu/cmake/eigenpy/eigenpyConfig.cmake:149 (SEARCH_FOR_BOOST_PYTHON)
+[222.032s]   /usr/share/cmake-3.22/Modules/CMakeFindDependencyMacro.cmake:47 (find_package)
+[222.033s]   /opt/ros/humble/lib/x86_64-linux-gnu/cmake/pinocchio/pinocchioConfig.cmake:161 (find_dependency)
+[222.033s]   CMakeLists.txt:54 (find_package)
+[222.033s] 
+[222.033s] [0m
+[222.035s] -- Found Boost: /usr/include (found version "1.74.0") found components: python310 
+[223.091s] -- Default C++ standard: 201703
+[223.091s] -- Minimal C++ standard upgraded to 11
+[223.091s] -- C++ standard sufficient: Minimal required 11, currently defined: 17
+[223.099s] -- hpp-fcl FOUND. hpp-fcl at /opt/ros/humble/lib/x86_64-linux-gnu/libhpp-fcl.so
+[223.111s] -- Found Boost: /usr/include (found version "1.74.0") found components: chrono serialization filesystem 
+[223.123s] -- C++ standard sufficient: Minimal required 11, currently defined: 17
+[223.126s] -- C++ standard sufficient: Minimal required 11, currently defined: 17
+[231.580s] -- Found TinyXML2: /usr/lib/x86_64-linux-gnu/libtinyxml2.so (found version "9.0.0") 
+[231.587s] -- Looking for C++ include pthread.h
+[232.260s] -- Looking for C++ include pthread.h - found
+[232.262s] -- Performing Test CMAKE_HAVE_LIBC_PTHREAD
+[232.924s] -- Performing Test CMAKE_HAVE_LIBC_PTHREAD - Success
+[232.925s] -- Found Threads: TRUE  
+[232.931s] -- Found fmt: 8.1.1
+[232.940s] -- Found fmt: 8.1.1
+[232.961s] -- .git directory found, setting version from latest git tag
+[232.978s] -- libfranka version: 0.20.4, Package tag: 0.20.4
+[233.084s] -- Configuring done
+[233.203s] -- Generating done
+[233.224s] -- Build files have been written to: /home/raiaan/franka_ros2_ws/build/libfranka
+[233.238s] Invoked command in '/home/raiaan/franka_ros2_ws/build/libfranka' returned '0': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/opt/ros/humble /usr/bin/cmake /home/raiaan/franka_ros2_ws/src/libfranka -DBUILD_TESTS=OFF -DCMAKE_INSTALL_PREFIX=/home/raiaan/franka_ros2_ws/install/libfranka
+[233.239s] Invoking command in '/home/raiaan/franka_ros2_ws/build/libfranka': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/opt/ros/humble /usr/bin/cmake --build /home/raiaan/franka_ros2_ws/build/libfranka -- -j6 -l6
+[233.300s] [  3%] [32mBuilding CXX object CMakeFiles/franka.dir/src/control_tools.cpp.o[0m
+[233.300s] [  3%] [32mBuilding CXX object CMakeFiles/franka.dir/src/active_motion_generator.cpp.o[0m
+[233.300s] [  3%] [32mBuilding CXX object CMakeFiles/franka.dir/src/active_control.cpp.o[0m
+[233.302s] [  5%] [32mBuilding CXX object CMakeFiles/franka.dir/src/active_torque_control.cpp.o[0m
+[233.303s] [  6%] [32mBuilding CXX object CMakeFiles/franka.dir/src/control_types.cpp.o[0m
+[233.305s] [  7%] [32mBuilding CXX object CMakeFiles/franka.dir/src/control_loop.cpp.o[0m
+[233.682s] [  9%] [32mBuilding CXX object CMakeFiles/franka.dir/src/duration.cpp.o[0m
+[233.806s] [ 10%] [32mBuilding CXX object CMakeFiles/franka.dir/src/errors.cpp.o[0m
+[233.899s] [ 11%] [32mBuilding CXX object CMakeFiles/franka.dir/src/exception.cpp.o[0m
+[234.261s] [ 12%] [32mBuilding CXX object CMakeFiles/franka.dir/src/gripper.cpp.o[0m
+[234.266s] [ 14%] [32mBuilding CXX object CMakeFiles/franka.dir/src/gripper_state.cpp.o[0m
+[234.355s] [ 15%] [32mBuilding CXX object CMakeFiles/franka.dir/src/joint_velocity_limits.cpp.o[0m
+[234.389s] [ 16%] [32mBuilding CXX object CMakeFiles/franka.dir/src/load_calculations.cpp.o[0m
+[234.461s] [ 18%] [32mBuilding CXX object CMakeFiles/franka.dir/src/lowpass_filter.cpp.o[0m
+[234.527s] [ 19%] [32mBuilding CXX object CMakeFiles/franka.dir/src/model.cpp.o[0m
+[234.845s] [ 20%] [32mBuilding CXX object CMakeFiles/franka.dir/src/network.cpp.o[0m
+[235.132s] [ 22%] [32mBuilding CXX object CMakeFiles/franka.dir/src/rate_limiting.cpp.o[0m
+[235.587s] [ 23%] [32mBuilding CXX object CMakeFiles/franka.dir/src/robot.cpp.o[0m
+[235.783s] [ 24%] [32mBuilding CXX object CMakeFiles/franka.dir/src/robot_impl.cpp.o[0m
+[235.808s] [ 25%] [32mBuilding CXX object CMakeFiles/franka.dir/src/robot_state.cpp.o[0m
+[236.283s] [ 27%] [32mBuilding CXX object CMakeFiles/franka.dir/src/vacuum_gripper.cpp.o[0m
+[237.100s] [ 28%] [32mBuilding CXX object CMakeFiles/franka.dir/src/vacuum_gripper_state.cpp.o[0m
+[237.474s] [ 29%] [32mBuilding CXX object CMakeFiles/franka.dir/src/robot_model.cpp.o[0m
+[237.694s] [ 31%] [32mBuilding CXX object CMakeFiles/franka.dir/src/async_control/async_position_control_handler.cpp.o[0m
+[238.403s] [ 32%] [32mBuilding CXX object CMakeFiles/franka.dir/src/logging/cout_logging_sink.cpp.o[0m
+[238.701s] [ 33%] [32mBuilding CXX object CMakeFiles/franka.dir/src/logging/logger.cpp.o[0m
+[238.884s] [ 35%] [32mBuilding CXX object CMakeFiles/franka.dir/src/logging/robot_state_log.cpp.o[0m
+[239.231s] [ 36%] [32mBuilding CXX object CMakeFiles/franka.dir/src/logging/robot_state_logger.cpp.o[0m
+[308.321s] [ 37%] [32m[1mLinking CXX shared library libfranka.so[0m
+[309.364s] [ 37%] Built target franka
+[309.398s] [ 38%] [32mBuilding CXX object examples/CMakeFiles/examples_common.dir/examples_common.cpp.o[0m
+[310.875s] [ 40%] [32m[1mLinking CXX static library libexamples_common.a[0m
+[311.148s] [ 40%] Built target examples_common
+[311.177s] [ 41%] [32mBuilding CXX object examples/CMakeFiles/async_position_control.dir/async_position_control.cpp.o[0m
+[311.179s] [ 42%] [32mBuilding CXX object examples/CMakeFiles/cartesian_impedance_control.dir/cartesian_impedance_control.cpp.o[0m
+[311.185s] [ 44%] [32mBuilding CXX object examples/CMakeFiles/communication_test.dir/communication_test.cpp.o[0m
+[311.187s] [ 45%] [32mBuilding CXX object examples/CMakeFiles/force_control.dir/force_control.cpp.o[0m
+[311.195s] [ 46%] [32mBuilding CXX object examples/CMakeFiles/echo_robot_state.dir/echo_robot_state.cpp.o[0m
+[311.199s] [ 48%] [32mBuilding CXX object examples/CMakeFiles/generate_cartesian_pose_motion.dir/generate_cartesian_pose_motion.cpp.o[0m
+[311.930s] [ 49%] [32m[1mLinking CXX executable echo_robot_state[0m
+[312.517s] [ 50%] [32m[1mLinking CXX executable communication_test[0m
+[312.527s] [ 51%] [32m[1mLinking CXX executable generate_cartesian_pose_motion[0m
+[312.559s] [ 51%] Built target echo_robot_state
+[312.584s] [ 53%] [32mBuilding CXX object examples/CMakeFiles/generate_cartesian_pose_motion_external_control_loop.dir/generate_cartesian_pose_motion_external_control_loop.cpp.o[0m
+[312.773s] [ 54%] [32m[1mLinking CXX executable async_position_control[0m
+[312.997s] [ 54%] Built target generate_cartesian_pose_motion
+[312.997s] [ 54%] Built target communication_test
+[313.020s] [ 55%] [32mBuilding CXX object examples/CMakeFiles/generate_cartesian_velocity_motion_external_control_loop.dir/generate_cartesian_velocity_motion_external_control_loop.cpp.o[0m
+[313.021s] [ 57%] [32mBuilding CXX object examples/CMakeFiles/generate_cartesian_velocity_motion.dir/generate_cartesian_velocity_motion.cpp.o[0m
+[313.152s] [ 58%] [32m[1mLinking CXX executable force_control[0m
+[313.415s] [ 58%] Built target async_position_control
+[313.440s] [ 59%] [32mBuilding CXX object examples/CMakeFiles/generate_consecutive_motions.dir/generate_consecutive_motions.cpp.o[0m
+[313.770s] [ 59%] Built target force_control
+[313.795s] [ 61%] [32mBuilding CXX object examples/CMakeFiles/generate_elbow_motion.dir/generate_elbow_motion.cpp.o[0m
+[313.820s] [ 62%] [32m[1mLinking CXX executable generate_cartesian_pose_motion_external_control_loop[0m
+[314.215s] [ 63%] [32m[1mLinking CXX executable generate_cartesian_velocity_motion[0m
+[314.342s] [ 64%] [32m[1mLinking CXX executable generate_cartesian_velocity_motion_external_control_loop[0m
+[314.447s] [ 64%] Built target generate_cartesian_pose_motion_external_control_loop
+[314.472s] [ 66%] [32mBuilding CXX object examples/CMakeFiles/generate_joint_position_motion.dir/generate_joint_position_motion.cpp.o[0m
+[314.682s] [ 67%] [32m[1mLinking CXX executable generate_consecutive_motions[0m
+[314.809s] [ 67%] Built target generate_cartesian_velocity_motion
+[314.836s] [ 68%] [32mBuilding CXX object examples/CMakeFiles/generate_joint_position_motion_external_control_loop.dir/generate_joint_position_motion_external_control_loop.cpp.o[0m
+[314.927s] [ 68%] Built target generate_cartesian_velocity_motion_external_control_loop
+[314.955s] [ 70%] [32mBuilding CXX object examples/CMakeFiles/generate_joint_velocity_motion.dir/generate_joint_velocity_motion.cpp.o[0m
+[315.143s] [ 71%] [32m[1mLinking CXX executable generate_elbow_motion[0m
+[315.278s] [ 71%] Built target generate_consecutive_motions
+[315.303s] [ 72%] [32mBuilding CXX object examples/CMakeFiles/generate_joint_velocity_motion_external_control_loop.dir/generate_joint_velocity_motion_external_control_loop.cpp.o[0m
+[315.523s] [ 74%] [32m[1mLinking CXX executable cartesian_impedance_control[0m
+[315.608s] [ 75%] [32m[1mLinking CXX executable generate_joint_position_motion[0m
+[315.782s] [ 75%] Built target generate_elbow_motion
+[315.809s] [ 76%] [32mBuilding CXX object examples/CMakeFiles/grasp_object.dir/grasp_object.cpp.o[0m
+[316.079s] [ 77%] [32m[1mLinking CXX executable generate_joint_velocity_motion[0m
+[316.101s] [ 79%] [32m[1mLinking CXX executable generate_joint_position_motion_external_control_loop[0m
+[316.103s] [ 79%] Built target cartesian_impedance_control
+[316.130s] [ 80%] [32mBuilding CXX object examples/CMakeFiles/joint_impedance_control.dir/joint_impedance_control.cpp.o[0m
+[316.209s] [ 80%] Built target generate_joint_position_motion
+[316.234s] [ 81%] [32mBuilding CXX object examples/CMakeFiles/joint_point_to_point_motion.dir/joint_point_to_point_motion.cpp.o[0m
+[316.379s] [ 83%] [32m[1mLinking CXX executable grasp_object[0m
+[316.540s] [ 84%] [32m[1mLinking CXX executable generate_joint_velocity_motion_external_control_loop[0m
+[316.552s] [ 84%] Built target generate_joint_velocity_motion
+[316.560s] [ 84%] Built target generate_joint_position_motion_external_control_loop
+[316.575s] [ 85%] [32mBuilding CXX object examples/CMakeFiles/motion_with_control.dir/motion_with_control.cpp.o[0m
+[316.585s] [ 87%] [32mBuilding CXX object examples/CMakeFiles/motion_with_control_external_control_loop.dir/motion_with_control_external_control_loop.cpp.o[0m
+[316.963s] [ 87%] Built target grasp_object
+[316.989s] [ 88%] [32mBuilding CXX object examples/CMakeFiles/print_joint_poses.dir/print_joint_poses.cpp.o[0m
+[317.149s] [ 88%] Built target generate_joint_velocity_motion_external_control_loop
+[317.168s] [ 89%] [32mBuilding CXX object examples/CMakeFiles/vacuum_object.dir/vacuum_object.cpp.o[0m
+[317.363s] [ 90%] [32m[1mLinking CXX executable joint_point_to_point_motion[0m
+[317.380s] [ 92%] [32m[1mLinking CXX executable joint_impedance_control[0m
+[317.564s] [ 93%] [32m[1mLinking CXX executable print_joint_poses[0m
+[317.599s] [ 94%] [32m[1mLinking CXX executable vacuum_object[0m
+[317.786s] [ 94%] Built target joint_point_to_point_motion
+[317.800s] [ 94%] Built target joint_impedance_control
+[317.806s] [ 96%] [32mBuilding CXX object examples/utility_examples/CMakeFiles/logging_example.dir/logging_example.cpp.o[0m
+[317.850s] [ 97%] [32m[1mLinking CXX executable motion_with_control[0m
+[317.959s] [ 98%] [32m[1mLinking CXX executable motion_with_control_external_control_loop[0m
+[318.068s] [ 98%] Built target print_joint_poses
+[318.098s] [ 98%] Built target vacuum_object
+[318.258s] [100%] [32m[1mLinking CXX executable logging_example[0m
+[318.379s] [100%] Built target motion_with_control
+[318.544s] [100%] Built target motion_with_control_external_control_loop
+[318.729s] [100%] Built target logging_example
+[318.749s] Invoked command in '/home/raiaan/franka_ros2_ws/build/libfranka' returned '0': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/opt/ros/humble /usr/bin/cmake --build /home/raiaan/franka_ros2_ws/build/libfranka -- -j6 -l6
+[318.763s] Invoking command in '/home/raiaan/franka_ros2_ws/build/libfranka': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/opt/ros/humble /usr/bin/cmake --install /home/raiaan/franka_ros2_ws/build/libfranka
+[318.773s] -- Install configuration: "Release"
+[318.775s] -- Installing: /home/raiaan/franka_ros2_ws/install/libfranka/lib/libfranka.so.0.20.4
+[318.777s] -- Installing: /home/raiaan/franka_ros2_ws/install/libfranka/lib/libfranka.so.0.20
+[318.777s] -- Set runtime path of "/home/raiaan/franka_ros2_ws/install/libfranka/lib/libfranka.so.0.20.4" to ""
+[318.777s] -- Installing: /home/raiaan/franka_ros2_ws/install/libfranka/lib/libfranka.so
+[318.777s] -- Installing: /home/raiaan/franka_ros2_ws/install/libfranka/include
+[318.778s] -- Installing: /home/raiaan/franka_ros2_ws/install/libfranka/include/franka
+[318.778s] -- Installing: /home/raiaan/franka_ros2_ws/install/libfranka/include/franka/active_control.h
+[318.778s] -- Installing: /home/raiaan/franka_ros2_ws/install/libfranka/include/franka/joint_velocity_limits.h
+[318.778s] -- Installing: /home/raiaan/franka_ros2_ws/install/libfranka/include/franka/vacuum_gripper.h
+[318.778s] -- Installing: /home/raiaan/franka_ros2_ws/install/libfranka/include/franka/control_types.h
+[318.778s] -- Installing: /home/raiaan/franka_ros2_ws/install/libfranka/include/franka/active_motion_generator.h
+[318.778s] -- Installing: /home/raiaan/franka_ros2_ws/install/libfranka/include/franka/active_torque_control.h
+[318.778s] -- Installing: /home/raiaan/franka_ros2_ws/install/libfranka/include/franka/exception.h
+[318.778s] -- Installing: /home/raiaan/franka_ros2_ws/install/libfranka/include/franka/gripper.h
+[318.779s] -- Installing: /home/raiaan/franka_ros2_ws/install/libfranka/include/franka/duration.h
+[318.779s] -- Installing: /home/raiaan/franka_ros2_ws/install/libfranka/include/franka/async_control
+[318.779s] -- Installing: /home/raiaan/franka_ros2_ws/install/libfranka/include/franka/async_control/target_status.hpp
+[318.779s] -- Installing: /home/raiaan/franka_ros2_ws/install/libfranka/include/franka/async_control/async_position_control_handler.hpp
+[318.779s] -- Installing: /home/raiaan/franka_ros2_ws/install/libfranka/include/franka/rate_limiting.h
+[318.779s] -- Installing: /home/raiaan/franka_ros2_ws/install/libfranka/include/franka/logging
+[318.780s] -- Installing: /home/raiaan/franka_ros2_ws/install/libfranka/include/franka/logging/cout_logging_sink.hpp
+[318.780s] -- Installing: /home/raiaan/franka_ros2_ws/install/libfranka/include/franka/logging/logger.hpp
+[318.780s] -- Installing: /home/raiaan/franka_ros2_ws/install/libfranka/include/franka/logging/robot_state_log.hpp
+[318.780s] -- Installing: /home/raiaan/franka_ros2_ws/install/libfranka/include/franka/logging/logging_sink_interface.hpp
+[318.780s] -- Installing: /home/raiaan/franka_ros2_ws/install/libfranka/include/franka/errors.h
+[318.780s] -- Installing: /home/raiaan/franka_ros2_ws/install/libfranka/include/franka/active_control_base.h
+[318.780s] -- Installing: /home/raiaan/franka_ros2_ws/install/libfranka/include/franka/commands
+[318.780s] -- Installing: /home/raiaan/franka_ros2_ws/install/libfranka/include/franka/commands/get_robot_model_command.hpp
+[318.780s] -- Installing: /home/raiaan/franka_ros2_ws/install/libfranka/include/franka/robot.h
+[318.780s] -- Installing: /home/raiaan/franka_ros2_ws/install/libfranka/include/franka/control_tools.h
+[318.781s] -- Installing: /home/raiaan/franka_ros2_ws/install/libfranka/include/franka/robot_state.h
+[318.781s] -- Installing: /home/raiaan/franka_ros2_ws/install/libfranka/include/franka/vacuum_gripper_state.h
+[318.781s] -- Installing: /home/raiaan/franka_ros2_ws/install/libfranka/include/franka/lowpass_filter.h
+[318.781s] -- Installing: /home/raiaan/franka_ros2_ws/install/libfranka/include/franka/robot_model_base.h
+[318.781s] -- Installing: /home/raiaan/franka_ros2_ws/install/libfranka/include/franka/robot_model.h
+[318.781s] -- Installing: /home/raiaan/franka_ros2_ws/install/libfranka/include/franka/gripper_state.h
+[318.781s] -- Installing: /home/raiaan/franka_ros2_ws/install/libfranka/include/franka/model.h
+[318.782s] -- Up-to-date: /home/raiaan/franka_ros2_ws/install/libfranka/include
+[318.782s] -- Installing: /home/raiaan/franka_ros2_ws/install/libfranka/include/research_interface
+[318.782s] -- Installing: /home/raiaan/franka_ros2_ws/install/libfranka/include/research_interface/robot
+[318.783s] -- Installing: /home/raiaan/franka_ros2_ws/install/libfranka/include/research_interface/robot/rbk_types.h
+[318.783s] -- Installing: /home/raiaan/franka_ros2_ws/install/libfranka/include/research_interface/robot/service_types.h
+[318.783s] -- Installing: /home/raiaan/franka_ros2_ws/install/libfranka/include/research_interface/robot/error.h
+[318.784s] -- Installing: /home/raiaan/franka_ros2_ws/install/libfranka/include/research_interface/robot/service_traits.h
+[318.784s] -- Installing: /home/raiaan/franka_ros2_ws/install/libfranka/include/research_interface/gripper
+[318.784s] -- Installing: /home/raiaan/franka_ros2_ws/install/libfranka/include/research_interface/gripper/types.h
+[318.785s] -- Installing: /home/raiaan/franka_ros2_ws/install/libfranka/include/research_interface/vacuum_gripper
+[318.785s] -- Installing: /home/raiaan/franka_ros2_ws/install/libfranka/include/research_interface/vacuum_gripper/types.h
+[318.786s] -- Installing: /home/raiaan/franka_ros2_ws/install/libfranka/lib/cmake/Franka/FrankaConfig.cmake
+[318.786s] -- Installing: /home/raiaan/franka_ros2_ws/install/libfranka/lib/cmake/Franka/FrankaConfigVersion.cmake
+[318.786s] -- Installing: /home/raiaan/franka_ros2_ws/install/libfranka/lib/cmake/Franka/FrankaTargets.cmake
+[318.786s] -- Installing: /home/raiaan/franka_ros2_ws/install/libfranka/lib/cmake/Franka/FrankaTargets-release.cmake
+[318.787s] -- Installing: /home/raiaan/franka_ros2_ws/install/libfranka/bin/async_position_control
+[318.788s] -- Set runtime path of "/home/raiaan/franka_ros2_ws/install/libfranka/bin/async_position_control" to ""
+[318.788s] -- Installing: /home/raiaan/franka_ros2_ws/install/libfranka/bin/cartesian_impedance_control
+[318.788s] -- Set runtime path of "/home/raiaan/franka_ros2_ws/install/libfranka/bin/cartesian_impedance_control" to ""
+[318.788s] -- Installing: /home/raiaan/franka_ros2_ws/install/libfranka/bin/communication_test
+[318.788s] -- Set runtime path of "/home/raiaan/franka_ros2_ws/install/libfranka/bin/communication_test" to ""
+[318.788s] -- Installing: /home/raiaan/franka_ros2_ws/install/libfranka/bin/echo_robot_state
+[318.789s] -- Set runtime path of "/home/raiaan/franka_ros2_ws/install/libfranka/bin/echo_robot_state" to ""
+[318.789s] -- Installing: /home/raiaan/franka_ros2_ws/install/libfranka/bin/force_control
+[318.789s] -- Set runtime path of "/home/raiaan/franka_ros2_ws/install/libfranka/bin/force_control" to ""
+[318.789s] -- Installing: /home/raiaan/franka_ros2_ws/install/libfranka/bin/generate_cartesian_pose_motion
+[318.790s] -- Set runtime path of "/home/raiaan/franka_ros2_ws/install/libfranka/bin/generate_cartesian_pose_motion" to ""
+[318.790s] -- Installing: /home/raiaan/franka_ros2_ws/install/libfranka/bin/generate_cartesian_pose_motion_external_control_loop
+[318.790s] -- Set runtime path of "/home/raiaan/franka_ros2_ws/install/libfranka/bin/generate_cartesian_pose_motion_external_control_loop" to ""
+[318.790s] -- Installing: /home/raiaan/franka_ros2_ws/install/libfranka/bin/generate_cartesian_velocity_motion
+[318.791s] -- Set runtime path of "/home/raiaan/franka_ros2_ws/install/libfranka/bin/generate_cartesian_velocity_motion" to ""
+[318.791s] -- Installing: /home/raiaan/franka_ros2_ws/install/libfranka/bin/generate_cartesian_velocity_motion_external_control_loop
+[318.791s] -- Set runtime path of "/home/raiaan/franka_ros2_ws/install/libfranka/bin/generate_cartesian_velocity_motion_external_control_loop" to ""
+[318.792s] -- Installing: /home/raiaan/franka_ros2_ws/install/libfranka/bin/generate_consecutive_motions
+[318.792s] -- Set runtime path of "/home/raiaan/franka_ros2_ws/install/libfranka/bin/generate_consecutive_motions" to ""
+[318.792s] -- Installing: /home/raiaan/franka_ros2_ws/install/libfranka/bin/generate_elbow_motion
+[318.793s] -- Set runtime path of "/home/raiaan/franka_ros2_ws/install/libfranka/bin/generate_elbow_motion" to ""
+[318.793s] -- Installing: /home/raiaan/franka_ros2_ws/install/libfranka/bin/generate_joint_position_motion
+[318.793s] -- Set runtime path of "/home/raiaan/franka_ros2_ws/install/libfranka/bin/generate_joint_position_motion" to ""
+[318.793s] -- Installing: /home/raiaan/franka_ros2_ws/install/libfranka/bin/generate_joint_position_motion_external_control_loop
+[318.793s] -- Set runtime path of "/home/raiaan/franka_ros2_ws/install/libfranka/bin/generate_joint_position_motion_external_control_loop" to ""
+[318.793s] -- Installing: /home/raiaan/franka_ros2_ws/install/libfranka/bin/generate_joint_velocity_motion
+[318.794s] -- Set runtime path of "/home/raiaan/franka_ros2_ws/install/libfranka/bin/generate_joint_velocity_motion" to ""
+[318.794s] -- Installing: /home/raiaan/franka_ros2_ws/install/libfranka/bin/generate_joint_velocity_motion_external_control_loop
+[318.794s] -- Set runtime path of "/home/raiaan/franka_ros2_ws/install/libfranka/bin/generate_joint_velocity_motion_external_control_loop" to ""
+[318.794s] -- Installing: /home/raiaan/franka_ros2_ws/install/libfranka/bin/grasp_object
+[318.794s] -- Set runtime path of "/home/raiaan/franka_ros2_ws/install/libfranka/bin/grasp_object" to ""
+[318.794s] -- Installing: /home/raiaan/franka_ros2_ws/install/libfranka/bin/joint_impedance_control
+[318.795s] -- Set runtime path of "/home/raiaan/franka_ros2_ws/install/libfranka/bin/joint_impedance_control" to ""
+[318.795s] -- Installing: /home/raiaan/franka_ros2_ws/install/libfranka/bin/joint_point_to_point_motion
+[318.795s] -- Set runtime path of "/home/raiaan/franka_ros2_ws/install/libfranka/bin/joint_point_to_point_motion" to ""
+[318.795s] -- Installing: /home/raiaan/franka_ros2_ws/install/libfranka/bin/motion_with_control
+[318.795s] -- Set runtime path of "/home/raiaan/franka_ros2_ws/install/libfranka/bin/motion_with_control" to ""
+[318.795s] -- Installing: /home/raiaan/franka_ros2_ws/install/libfranka/bin/motion_with_control_external_control_loop
+[318.795s] -- Set runtime path of "/home/raiaan/franka_ros2_ws/install/libfranka/bin/motion_with_control_external_control_loop" to ""
+[318.796s] -- Installing: /home/raiaan/franka_ros2_ws/install/libfranka/bin/print_joint_poses
+[318.796s] -- Set runtime path of "/home/raiaan/franka_ros2_ws/install/libfranka/bin/print_joint_poses" to ""
+[318.796s] -- Installing: /home/raiaan/franka_ros2_ws/install/libfranka/bin/vacuum_object
+[318.796s] -- Set runtime path of "/home/raiaan/franka_ros2_ws/install/libfranka/bin/vacuum_object" to ""
+[318.797s] -- Installing: /home/raiaan/franka_ros2_ws/install/libfranka/bin/logging_example
+[318.797s] -- Set runtime path of "/home/raiaan/franka_ros2_ws/install/libfranka/bin/logging_example" to ""
+[318.805s] Invoked command in '/home/raiaan/franka_ros2_ws/build/libfranka' returned '0': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/opt/ros/humble /usr/bin/cmake --install /home/raiaan/franka_ros2_ws/build/libfranka

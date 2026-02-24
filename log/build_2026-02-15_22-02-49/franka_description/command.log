@@ -1,0 +1,6 @@
+Invoking command in '/home/raiaan/franka_ros2_ws/build/franka_description': CMAKE_PREFIX_PATH=/opt/ros/humble /usr/bin/cmake /home/raiaan/franka_ros2_ws/src/franka_description -DAMENT_CMAKE_SYMLINK_INSTALL=1 -DCMAKE_INSTALL_PREFIX=/home/raiaan/franka_ros2_ws/install/franka_description
+Invoked command in '/home/raiaan/franka_ros2_ws/build/franka_description' returned '0': CMAKE_PREFIX_PATH=/opt/ros/humble /usr/bin/cmake /home/raiaan/franka_ros2_ws/src/franka_description -DAMENT_CMAKE_SYMLINK_INSTALL=1 -DCMAKE_INSTALL_PREFIX=/home/raiaan/franka_ros2_ws/install/franka_description
+Invoking command in '/home/raiaan/franka_ros2_ws/build/franka_description': CMAKE_PREFIX_PATH=/opt/ros/humble /usr/bin/cmake --build /home/raiaan/franka_ros2_ws/build/franka_description -- -j6 -l6
+Invoked command in '/home/raiaan/franka_ros2_ws/build/franka_description' returned '0': CMAKE_PREFIX_PATH=/opt/ros/humble /usr/bin/cmake --build /home/raiaan/franka_ros2_ws/build/franka_description -- -j6 -l6
+Invoking command in '/home/raiaan/franka_ros2_ws/build/franka_description': CMAKE_PREFIX_PATH=/opt/ros/humble /usr/bin/cmake --install /home/raiaan/franka_ros2_ws/build/franka_description
+Invoked command in '/home/raiaan/franka_ros2_ws/build/franka_description' returned '0': CMAKE_PREFIX_PATH=/opt/ros/humble /usr/bin/cmake --install /home/raiaan/franka_ros2_ws/build/franka_description

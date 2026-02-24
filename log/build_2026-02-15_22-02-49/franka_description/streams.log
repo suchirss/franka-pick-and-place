@@ -1,0 +1,205 @@
+[0.008s] Invoking command in '/home/raiaan/franka_ros2_ws/build/franka_description': CMAKE_PREFIX_PATH=/opt/ros/humble /usr/bin/cmake /home/raiaan/franka_ros2_ws/src/franka_description -DAMENT_CMAKE_SYMLINK_INSTALL=1 -DCMAKE_INSTALL_PREFIX=/home/raiaan/franka_ros2_ws/install/franka_description
+[0.522s] -- The C compiler identification is GNU 11.4.0
+[3.814s] -- The CXX compiler identification is GNU 11.4.0
+[6.397s] -- Detecting C compiler ABI info
+[7.025s] -- Detecting C compiler ABI info - done
+[7.038s] -- Check for working C compiler: /usr/bin/cc - skipped
+[7.039s] -- Detecting C compile features
+[7.039s] -- Detecting C compile features - done
+[7.045s] -- Detecting CXX compiler ABI info
+[7.655s] -- Detecting CXX compiler ABI info - done
+[7.669s] -- Check for working CXX compiler: /usr/bin/c++ - skipped
+[7.670s] -- Detecting CXX compile features
+[7.671s] -- Detecting CXX compile features - done
+[7.676s] -- Found ament_cmake: 1.3.12 (/opt/ros/humble/share/ament_cmake/cmake)
+[7.843s] -- Found Python3: /usr/bin/python3 (found version "3.10.12") found components: Interpreter 
+[7.923s] -- Override CMake install command with custom implementation using symlinks instead of copying resources
+[7.961s] -- Found ament_lint_auto: 0.12.14 (/opt/ros/humble/share/ament_lint_auto/cmake)
+[8.766s] -- Added test 'copyright' to check source files copyright and LICENSE
+[8.812s] -- Added test 'flake8' to check Python code syntax and style conventions
+[8.814s] -- Added test 'lint_cmake' to check CMake code style
+[8.816s] -- Added test 'pep257' to check Python code against some of the docstring style conventions in PEP 257
+[8.827s] -- Added test 'xmllint' to check XML markup files
+[8.829s] -- Configuring done
+[8.835s] -- Generating done
+[8.837s] -- Build files have been written to: /home/raiaan/franka_ros2_ws/build/franka_description
+[8.849s] Invoked command in '/home/raiaan/franka_ros2_ws/build/franka_description' returned '0': CMAKE_PREFIX_PATH=/opt/ros/humble /usr/bin/cmake /home/raiaan/franka_ros2_ws/src/franka_description -DAMENT_CMAKE_SYMLINK_INSTALL=1 -DCMAKE_INSTALL_PREFIX=/home/raiaan/franka_ros2_ws/install/franka_description
+[8.849s] Invoking command in '/home/raiaan/franka_ros2_ws/build/franka_description': CMAKE_PREFIX_PATH=/opt/ros/humble /usr/bin/cmake --build /home/raiaan/franka_ros2_ws/build/franka_description -- -j6 -l6
+[8.887s] Invoked command in '/home/raiaan/franka_ros2_ws/build/franka_description' returned '0': CMAKE_PREFIX_PATH=/opt/ros/humble /usr/bin/cmake --build /home/raiaan/franka_ros2_ws/build/franka_description -- -j6 -l6
+[8.890s] Invoking command in '/home/raiaan/franka_ros2_ws/build/franka_description': CMAKE_PREFIX_PATH=/opt/ros/humble /usr/bin/cmake --install /home/raiaan/franka_ros2_ws/build/franka_description
+[8.897s] -- Install configuration: ""
+[8.898s] -- Execute custom install script
+[8.899s] -- Symlinking: /home/raiaan/franka_ros2_ws/install/franka_description/share/franka_description//launch/visualize_franka.launch.py
+[8.908s] -- Symlinking: /home/raiaan/franka_ros2_ws/install/franka_description/share/franka_description//launch/visualize_franka_duo.launch.py
+[8.918s] -- Symlinking: /home/raiaan/franka_ros2_ws/install/franka_description/share/franka_description//robots/common/franka_arm.ros2_control.xacro
+[8.927s] -- Symlinking: /home/raiaan/franka_ros2_ws/install/franka_description/share/franka_description//robots/common/franka_arm.srdf.xacro
+[8.937s] -- Symlinking: /home/raiaan/franka_ros2_ws/install/franka_description/share/franka_description//robots/common/franka_arm.xacro
+[8.945s] -- Symlinking: /home/raiaan/franka_ros2_ws/install/franka_description/share/franka_description//robots/common/franka_robot.xacro
+[8.956s] -- Symlinking: /home/raiaan/franka_ros2_ws/install/franka_description/share/franka_description//robots/common/group_definition.xacro
+[8.967s] -- Symlinking: /home/raiaan/franka_ros2_ws/install/franka_description/share/franka_description//robots/common/utils.xacro
+[8.980s] -- Symlinking: /home/raiaan/franka_ros2_ws/install/franka_description/share/franka_description//robots/fer/dynamics.yaml
+[8.993s] -- Symlinking: /home/raiaan/franka_ros2_ws/install/franka_description/share/franka_description//robots/fer/fer.srdf.xacro
+[9.003s] -- Symlinking: /home/raiaan/franka_ros2_ws/install/franka_description/share/franka_description//robots/fer/fer.urdf.xacro
+[9.012s] -- Symlinking: /home/raiaan/franka_ros2_ws/install/franka_description/share/franka_description//robots/fer/inertials.yaml
+[9.022s] -- Symlinking: /home/raiaan/franka_ros2_ws/install/franka_description/share/franka_description//robots/fer/joint_limits.yaml
+[9.032s] -- Symlinking: /home/raiaan/franka_ros2_ws/install/franka_description/share/franka_description//robots/fer/kinematics.yaml
+[9.041s] -- Symlinking: /home/raiaan/franka_ros2_ws/install/franka_description/share/franka_description//robots/fp3/accelerometers.yaml
+[9.049s] -- Symlinking: /home/raiaan/franka_ros2_ws/install/franka_description/share/franka_description//robots/fp3/dynamics.yaml
+[9.057s] -- Symlinking: /home/raiaan/franka_ros2_ws/install/franka_description/share/franka_description//robots/fp3/fp3.srdf.xacro
+[9.068s] -- Symlinking: /home/raiaan/franka_ros2_ws/install/franka_description/share/franka_description//robots/fp3/fp3.urdf.xacro
+[9.078s] -- Symlinking: /home/raiaan/franka_ros2_ws/install/franka_description/share/franka_description//robots/fp3/inertials.yaml
+[9.086s] -- Symlinking: /home/raiaan/franka_ros2_ws/install/franka_description/share/franka_description//robots/fp3/joint_limits.yaml
+[9.095s] -- Symlinking: /home/raiaan/franka_ros2_ws/install/franka_description/share/franka_description//robots/fp3/kinematics.yaml
+[9.104s] -- Symlinking: /home/raiaan/franka_ros2_ws/install/franka_description/share/franka_description//robots/fr3/accelerometers.yaml
+[9.112s] -- Symlinking: /home/raiaan/franka_ros2_ws/install/franka_description/share/franka_description//robots/fr3/dynamics.yaml
+[9.121s] -- Symlinking: /home/raiaan/franka_ros2_ws/install/franka_description/share/franka_description//robots/fr3/fr3.srdf.xacro
+[9.130s] -- Symlinking: /home/raiaan/franka_ros2_ws/install/franka_description/share/franka_description//robots/fr3/fr3.urdf.xacro
+[9.141s] -- Symlinking: /home/raiaan/franka_ros2_ws/install/franka_description/share/franka_description//robots/fr3/inertials.yaml
+[9.150s] -- Symlinking: /home/raiaan/franka_ros2_ws/install/franka_description/share/franka_description//robots/fr3/joint_limits.yaml
+[9.159s] -- Symlinking: /home/raiaan/franka_ros2_ws/install/franka_description/share/franka_description//robots/fr3/kinematics.yaml
+[9.173s] -- Symlinking: /home/raiaan/franka_ros2_ws/install/franka_description/share/franka_description//robots/fr3_duo/fr3_duo.urdf.xacro
+[9.183s] -- Symlinking: /home/raiaan/franka_ros2_ws/install/franka_description/share/franka_description//robots/fr3_duo/fr3_duo_arm.urdf.xacro
+[9.193s] -- Symlinking: /home/raiaan/franka_ros2_ws/install/franka_description/share/franka_description//robots/fr3_duo/fr3_duo_cover/fr3_duo_cover.xacro
+[9.204s] -- Symlinking: /home/raiaan/franka_ros2_ws/install/franka_description/share/franka_description//robots/fr3_duo/fr3_duo_cover/inertials.yaml
+[9.213s] -- Symlinking: /home/raiaan/franka_ros2_ws/install/franka_description/share/franka_description//robots/fr3_duo/fr3_duo_cover/kinematics.yaml
+[9.224s] -- Symlinking: /home/raiaan/franka_ros2_ws/install/franka_description/share/franka_description//robots/fr3_duo/fr3_duo_fixed_structure.urdf.xacro
+[9.234s] -- Symlinking: /home/raiaan/franka_ros2_ws/install/franka_description/share/franka_description//robots/fr3_duo/fr3_duo_mount/fr3_duo_mount.xacro
+[9.242s] -- Symlinking: /home/raiaan/franka_ros2_ws/install/franka_description/share/franka_description//robots/fr3_duo/fr3_duo_mount/inertials.yaml
+[9.253s] -- Symlinking: /home/raiaan/franka_ros2_ws/install/franka_description/share/franka_description//robots/fr3_duo/fr3_duo_mount/kinematics.yaml
+[9.262s] -- Symlinking: /home/raiaan/franka_ros2_ws/install/franka_description/share/franka_description//robots/fr3v2.1/accelerometers.yaml
+[9.270s] -- Symlinking: /home/raiaan/franka_ros2_ws/install/franka_description/share/franka_description//robots/fr3v2.1/dynamics.yaml
+[9.278s] -- Symlinking: /home/raiaan/franka_ros2_ws/install/franka_description/share/franka_description//robots/fr3v2.1/fr3v2.1.srdf.xacro
+[9.287s] -- Symlinking: /home/raiaan/franka_ros2_ws/install/franka_description/share/franka_description//robots/fr3v2.1/fr3v2.1.urdf.xacro
+[9.296s] -- Symlinking: /home/raiaan/franka_ros2_ws/install/franka_description/share/franka_description//robots/fr3v2.1/inertials.yaml
+[9.305s] -- Symlinking: /home/raiaan/franka_ros2_ws/install/franka_description/share/franka_description//robots/fr3v2.1/joint_limits.yaml
+[9.315s] -- Symlinking: /home/raiaan/franka_ros2_ws/install/franka_description/share/franka_description//robots/fr3v2.1/kinematics.yaml
+[9.325s] -- Symlinking: /home/raiaan/franka_ros2_ws/install/franka_description/share/franka_description//robots/fr3v2/accelerometers.yaml
+[9.337s] -- Symlinking: /home/raiaan/franka_ros2_ws/install/franka_description/share/franka_description//robots/fr3v2/dynamics.yaml
+[9.351s] -- Symlinking: /home/raiaan/franka_ros2_ws/install/franka_description/share/franka_description//robots/fr3v2/fr3v2.srdf.xacro
+[9.359s] -- Symlinking: /home/raiaan/franka_ros2_ws/install/franka_description/share/franka_description//robots/fr3v2/fr3v2.urdf.xacro
+[9.368s] -- Symlinking: /home/raiaan/franka_ros2_ws/install/franka_description/share/franka_description//robots/fr3v2/inertials.yaml
+[9.378s] -- Symlinking: /home/raiaan/franka_ros2_ws/install/franka_description/share/franka_description//robots/fr3v2/joint_limits.yaml
+[9.387s] -- Symlinking: /home/raiaan/franka_ros2_ws/install/franka_description/share/franka_description//robots/fr3v2/kinematics.yaml
+[9.396s] -- Symlinking: /home/raiaan/franka_ros2_ws/install/franka_description/share/franka_description//end_effectors/cobot_pump/cobot_pump.urdf.xacro
+[9.406s] -- Symlinking: /home/raiaan/franka_ros2_ws/install/franka_description/share/franka_description//end_effectors/cobot_pump/cobot_pump_arguments.xacro
+[9.416s] -- Symlinking: /home/raiaan/franka_ros2_ws/install/franka_description/share/franka_description//end_effectors/cobot_pump/inertials.yaml
+[9.426s] -- Symlinking: /home/raiaan/franka_ros2_ws/install/franka_description/share/franka_description//end_effectors/common/ee_with_one_link.xacro
+[9.434s] -- Symlinking: /home/raiaan/franka_ros2_ws/install/franka_description/share/franka_description//end_effectors/common/franka_hand.xacro
+[9.446s] -- Symlinking: /home/raiaan/franka_ros2_ws/install/franka_description/share/franka_description//end_effectors/common/utils.xacro
+[9.460s] -- Symlinking: /home/raiaan/franka_ros2_ws/install/franka_description/share/franka_description//end_effectors/franka_hand/franka_hand.srdf.xacro
+[9.478s] -- Symlinking: /home/raiaan/franka_ros2_ws/install/franka_description/share/franka_description//end_effectors/franka_hand/franka_hand.urdf.xacro
+[9.491s] -- Symlinking: /home/raiaan/franka_ros2_ws/install/franka_description/share/franka_description//end_effectors/franka_hand/franka_hand_arguments.xacro
+[9.503s] -- Symlinking: /home/raiaan/franka_ros2_ws/install/franka_description/share/franka_description//end_effectors/franka_hand/inertials.yaml
+[9.517s] -- Symlinking: /home/raiaan/franka_ros2_ws/install/franka_description/share/franka_description//meshes/robot_arms/fer/collision/hand.stl
+[9.526s] -- Symlinking: /home/raiaan/franka_ros2_ws/install/franka_description/share/franka_description//meshes/robot_arms/fer/collision/link0.stl
+[9.537s] -- Symlinking: /home/raiaan/franka_ros2_ws/install/franka_description/share/franka_description//meshes/robot_arms/fer/collision/link1.stl
+[9.552s] -- Symlinking: /home/raiaan/franka_ros2_ws/install/franka_description/share/franka_description//meshes/robot_arms/fer/collision/link2.stl
+[9.564s] -- Symlinking: /home/raiaan/franka_ros2_ws/install/franka_description/share/franka_description//meshes/robot_arms/fer/collision/link3.stl
+[9.576s] -- Symlinking: /home/raiaan/franka_ros2_ws/install/franka_description/share/franka_description//meshes/robot_arms/fer/collision/link4.stl
+[9.593s] -- Symlinking: /home/raiaan/franka_ros2_ws/install/franka_description/share/franka_description//meshes/robot_arms/fer/collision/link5.stl
+[9.607s] -- Symlinking: /home/raiaan/franka_ros2_ws/install/franka_description/share/franka_description//meshes/robot_arms/fer/collision/link6.stl
+[9.621s] -- Symlinking: /home/raiaan/franka_ros2_ws/install/franka_description/share/franka_description//meshes/robot_arms/fer/collision/link7.stl
+[9.635s] -- Symlinking: /home/raiaan/franka_ros2_ws/install/franka_description/share/franka_description//meshes/robot_arms/fer/visual/finger.dae
+[9.650s] -- Symlinking: /home/raiaan/franka_ros2_ws/install/franka_description/share/franka_description//meshes/robot_arms/fer/visual/hand.dae
+[9.665s] -- Symlinking: /home/raiaan/franka_ros2_ws/install/franka_description/share/franka_description//meshes/robot_arms/fer/visual/link0.dae
+[9.679s] -- Symlinking: /home/raiaan/franka_ros2_ws/install/franka_description/share/franka_description//meshes/robot_arms/fer/visual/link1.dae
+[9.694s] -- Symlinking: /home/raiaan/franka_ros2_ws/install/franka_description/share/franka_description//meshes/robot_arms/fer/visual/link2.dae
+[9.711s] -- Symlinking: /home/raiaan/franka_ros2_ws/install/franka_description/share/franka_description//meshes/robot_arms/fer/visual/link3.dae
+[9.727s] -- Symlinking: /home/raiaan/franka_ros2_ws/install/franka_description/share/franka_description//meshes/robot_arms/fer/visual/link4.dae
+[9.742s] -- Symlinking: /home/raiaan/franka_ros2_ws/install/franka_description/share/franka_description//meshes/robot_arms/fer/visual/link5.dae
+[9.756s] -- Symlinking: /home/raiaan/franka_ros2_ws/install/franka_description/share/franka_description//meshes/robot_arms/fer/visual/link6.dae
+[9.766s] -- Symlinking: /home/raiaan/franka_ros2_ws/install/franka_description/share/franka_description//meshes/robot_arms/fer/visual/link7.dae
+[9.777s] -- Symlinking: /home/raiaan/franka_ros2_ws/install/franka_description/share/franka_description//meshes/robot_arms/fp3/collision/link0.stl
+[9.787s] -- Symlinking: /home/raiaan/franka_ros2_ws/install/franka_description/share/franka_description//meshes/robot_arms/fp3/collision/link1.stl
+[9.799s] -- Symlinking: /home/raiaan/franka_ros2_ws/install/franka_description/share/franka_description//meshes/robot_arms/fp3/collision/link2.stl
+[9.817s] -- Symlinking: /home/raiaan/franka_ros2_ws/install/franka_description/share/franka_description//meshes/robot_arms/fp3/collision/link3.stl
+[9.834s] -- Symlinking: /home/raiaan/franka_ros2_ws/install/franka_description/share/franka_description//meshes/robot_arms/fp3/collision/link4.stl
+[9.850s] -- Symlinking: /home/raiaan/franka_ros2_ws/install/franka_description/share/franka_description//meshes/robot_arms/fp3/collision/link5.stl
+[9.863s] -- Symlinking: /home/raiaan/franka_ros2_ws/install/franka_description/share/franka_description//meshes/robot_arms/fp3/collision/link6.stl
+[9.873s] -- Symlinking: /home/raiaan/franka_ros2_ws/install/franka_description/share/franka_description//meshes/robot_arms/fp3/collision/link7.stl
+[9.881s] -- Symlinking: /home/raiaan/franka_ros2_ws/install/franka_description/share/franka_description//meshes/robot_arms/fp3/visual/link0.dae
+[9.890s] -- Symlinking: /home/raiaan/franka_ros2_ws/install/franka_description/share/franka_description//meshes/robot_arms/fp3/visual/link1.dae
+[9.898s] -- Symlinking: /home/raiaan/franka_ros2_ws/install/franka_description/share/franka_description//meshes/robot_arms/fp3/visual/link2.dae
+[9.908s] -- Symlinking: /home/raiaan/franka_ros2_ws/install/franka_description/share/franka_description//meshes/robot_arms/fp3/visual/link3.dae
+[9.916s] -- Symlinking: /home/raiaan/franka_ros2_ws/install/franka_description/share/franka_description//meshes/robot_arms/fp3/visual/link4.dae
+[9.925s] -- Symlinking: /home/raiaan/franka_ros2_ws/install/franka_description/share/franka_description//meshes/robot_arms/fp3/visual/link5.dae
+[9.934s] -- Symlinking: /home/raiaan/franka_ros2_ws/install/franka_description/share/franka_description//meshes/robot_arms/fp3/visual/link6.dae
+[9.944s] -- Symlinking: /home/raiaan/franka_ros2_ws/install/franka_description/share/franka_description//meshes/robot_arms/fp3/visual/link7.dae
+[9.959s] -- Symlinking: /home/raiaan/franka_ros2_ws/install/franka_description/share/franka_description//meshes/robot_arms/fr3/collision/link0.stl
+[9.970s] -- Symlinking: /home/raiaan/franka_ros2_ws/install/franka_description/share/franka_description//meshes/robot_arms/fr3/collision/link1.stl
+[9.979s] -- Symlinking: /home/raiaan/franka_ros2_ws/install/franka_description/share/franka_description//meshes/robot_arms/fr3/collision/link2.stl
+[9.989s] -- Symlinking: /home/raiaan/franka_ros2_ws/install/franka_description/share/franka_description//meshes/robot_arms/fr3/collision/link3.stl
+[10.002s] -- Symlinking: /home/raiaan/franka_ros2_ws/install/franka_description/share/franka_description//meshes/robot_arms/fr3/collision/link4.stl
+[10.015s] -- Symlinking: /home/raiaan/franka_ros2_ws/install/franka_description/share/franka_description//meshes/robot_arms/fr3/collision/link5.stl
+[10.027s] -- Symlinking: /home/raiaan/franka_ros2_ws/install/franka_description/share/franka_description//meshes/robot_arms/fr3/collision/link6.stl
+[10.037s] -- Symlinking: /home/raiaan/franka_ros2_ws/install/franka_description/share/franka_description//meshes/robot_arms/fr3/collision/link7.stl
+[10.045s] -- Symlinking: /home/raiaan/franka_ros2_ws/install/franka_description/share/franka_description//meshes/robot_arms/fr3/visual/link0.dae
+[10.053s] -- Symlinking: /home/raiaan/franka_ros2_ws/install/franka_description/share/franka_description//meshes/robot_arms/fr3/visual/link1.dae
+[10.062s] -- Symlinking: /home/raiaan/franka_ros2_ws/install/franka_description/share/franka_description//meshes/robot_arms/fr3/visual/link2.dae
+[10.073s] -- Symlinking: /home/raiaan/franka_ros2_ws/install/franka_description/share/franka_description//meshes/robot_arms/fr3/visual/link3.dae
+[10.083s] -- Symlinking: /home/raiaan/franka_ros2_ws/install/franka_description/share/franka_description//meshes/robot_arms/fr3/visual/link4.dae
+[10.092s] -- Symlinking: /home/raiaan/franka_ros2_ws/install/franka_description/share/franka_description//meshes/robot_arms/fr3/visual/link5.dae
+[10.101s] -- Symlinking: /home/raiaan/franka_ros2_ws/install/franka_description/share/franka_description//meshes/robot_arms/fr3/visual/link6.dae
+[10.109s] -- Symlinking: /home/raiaan/franka_ros2_ws/install/franka_description/share/franka_description//meshes/robot_arms/fr3/visual/link7.dae
+[10.120s] -- Symlinking: /home/raiaan/franka_ros2_ws/install/franka_description/share/franka_description//meshes/robot_arms/fr3_duo/cover/collision/fr3_duo_cover.stl
+[10.132s] -- Symlinking: /home/raiaan/franka_ros2_ws/install/franka_description/share/franka_description//meshes/robot_arms/fr3_duo/cover/visual/fr3_duo_cover.dae
+[10.142s] -- Symlinking: /home/raiaan/franka_ros2_ws/install/franka_description/share/franka_description//meshes/robot_arms/fr3_duo/mount/collision/fr3_duo_mount.stl
+[10.152s] -- Symlinking: /home/raiaan/franka_ros2_ws/install/franka_description/share/franka_description//meshes/robot_arms/fr3_duo/mount/visual/fr3_duo_mount.dae
+[10.162s] -- Symlinking: /home/raiaan/franka_ros2_ws/install/franka_description/share/franka_description//meshes/robot_arms/fr3v2.1/collision/link0.stl
+[10.172s] -- Symlinking: /home/raiaan/franka_ros2_ws/install/franka_description/share/franka_description//meshes/robot_arms/fr3v2.1/collision/link1.stl
+[10.183s] -- Symlinking: /home/raiaan/franka_ros2_ws/install/franka_description/share/franka_description//meshes/robot_arms/fr3v2.1/collision/link2.stl
+[10.192s] -- Symlinking: /home/raiaan/franka_ros2_ws/install/franka_description/share/franka_description//meshes/robot_arms/fr3v2.1/collision/link3.stl
+[10.201s] -- Symlinking: /home/raiaan/franka_ros2_ws/install/franka_description/share/franka_description//meshes/robot_arms/fr3v2.1/collision/link4.stl
+[10.210s] -- Symlinking: /home/raiaan/franka_ros2_ws/install/franka_description/share/franka_description//meshes/robot_arms/fr3v2.1/collision/link5.stl
+[10.220s] -- Symlinking: /home/raiaan/franka_ros2_ws/install/franka_description/share/franka_description//meshes/robot_arms/fr3v2.1/collision/link6.stl
+[10.228s] -- Symlinking: /home/raiaan/franka_ros2_ws/install/franka_description/share/franka_description//meshes/robot_arms/fr3v2.1/collision/link7.stl
+[10.237s] -- Symlinking: /home/raiaan/franka_ros2_ws/install/franka_description/share/franka_description//meshes/robot_arms/fr3v2.1/visual/link0.dae
+[10.244s] -- Symlinking: /home/raiaan/franka_ros2_ws/install/franka_description/share/franka_description//meshes/robot_arms/fr3v2.1/visual/link1.dae
+[10.254s] -- Symlinking: /home/raiaan/franka_ros2_ws/install/franka_description/share/franka_description//meshes/robot_arms/fr3v2.1/visual/link2.dae
+[10.262s] -- Symlinking: /home/raiaan/franka_ros2_ws/install/franka_description/share/franka_description//meshes/robot_arms/fr3v2.1/visual/link3.dae
+[10.269s] -- Symlinking: /home/raiaan/franka_ros2_ws/install/franka_description/share/franka_description//meshes/robot_arms/fr3v2.1/visual/link4.dae
+[10.277s] -- Symlinking: /home/raiaan/franka_ros2_ws/install/franka_description/share/franka_description//meshes/robot_arms/fr3v2.1/visual/link5.dae
+[10.286s] -- Symlinking: /home/raiaan/franka_ros2_ws/install/franka_description/share/franka_description//meshes/robot_arms/fr3v2.1/visual/link6.dae
+[10.295s] -- Symlinking: /home/raiaan/franka_ros2_ws/install/franka_description/share/franka_description//meshes/robot_arms/fr3v2.1/visual/link7.dae
+[10.304s] -- Symlinking: /home/raiaan/franka_ros2_ws/install/franka_description/share/franka_description//meshes/robot_arms/fr3v2/collision/link0.stl
+[10.316s] -- Symlinking: /home/raiaan/franka_ros2_ws/install/franka_description/share/franka_description//meshes/robot_arms/fr3v2/collision/link1.stl
+[10.324s] -- Symlinking: /home/raiaan/franka_ros2_ws/install/franka_description/share/franka_description//meshes/robot_arms/fr3v2/collision/link2.stl
+[10.332s] -- Symlinking: /home/raiaan/franka_ros2_ws/install/franka_description/share/franka_description//meshes/robot_arms/fr3v2/collision/link3.stl
+[10.340s] -- Symlinking: /home/raiaan/franka_ros2_ws/install/franka_description/share/franka_description//meshes/robot_arms/fr3v2/collision/link4.stl
+[10.350s] -- Symlinking: /home/raiaan/franka_ros2_ws/install/franka_description/share/franka_description//meshes/robot_arms/fr3v2/collision/link5.stl
+[10.359s] -- Symlinking: /home/raiaan/franka_ros2_ws/install/franka_description/share/franka_description//meshes/robot_arms/fr3v2/collision/link6.stl
+[10.367s] -- Symlinking: /home/raiaan/franka_ros2_ws/install/franka_description/share/franka_description//meshes/robot_arms/fr3v2/collision/link7.stl
+[10.377s] -- Symlinking: /home/raiaan/franka_ros2_ws/install/franka_description/share/franka_description//meshes/robot_arms/fr3v2/visual/link0.dae
+[10.385s] -- Symlinking: /home/raiaan/franka_ros2_ws/install/franka_description/share/franka_description//meshes/robot_arms/fr3v2/visual/link1.dae
+[10.395s] -- Symlinking: /home/raiaan/franka_ros2_ws/install/franka_description/share/franka_description//meshes/robot_arms/fr3v2/visual/link2.dae
+[10.407s] -- Symlinking: /home/raiaan/franka_ros2_ws/install/franka_description/share/franka_description//meshes/robot_arms/fr3v2/visual/link3.dae
+[10.417s] -- Symlinking: /home/raiaan/franka_ros2_ws/install/franka_description/share/franka_description//meshes/robot_arms/fr3v2/visual/link4.dae
+[10.429s] -- Symlinking: /home/raiaan/franka_ros2_ws/install/franka_description/share/franka_description//meshes/robot_arms/fr3v2/visual/link5.dae
+[10.443s] -- Symlinking: /home/raiaan/franka_ros2_ws/install/franka_description/share/franka_description//meshes/robot_arms/fr3v2/visual/link6.dae
+[10.453s] -- Symlinking: /home/raiaan/franka_ros2_ws/install/franka_description/share/franka_description//meshes/robot_arms/fr3v2/visual/link7.dae
+[10.462s] -- Symlinking: /home/raiaan/franka_ros2_ws/install/franka_description/share/franka_description//meshes/robot_ee/cobot_pump/collision/cobot_pump.stl
+[10.472s] -- Symlinking: /home/raiaan/franka_ros2_ws/install/franka_description/share/franka_description//meshes/robot_ee/cobot_pump/visual/cobot_pump.dae
+[10.481s] -- Symlinking: /home/raiaan/franka_ros2_ws/install/franka_description/share/franka_description//meshes/robot_ee/franka_hand_black/collision/hand.stl
+[10.491s] -- Symlinking: /home/raiaan/franka_ros2_ws/install/franka_description/share/franka_description//meshes/robot_ee/franka_hand_black/visual/finger.dae
+[10.501s] -- Symlinking: /home/raiaan/franka_ros2_ws/install/franka_description/share/franka_description//meshes/robot_ee/franka_hand_black/visual/hand.dae
+[10.512s] -- Symlinking: /home/raiaan/franka_ros2_ws/install/franka_description/share/franka_description//meshes/robot_ee/franka_hand_white/collision/hand.stl
+[10.523s] -- Symlinking: /home/raiaan/franka_ros2_ws/install/franka_description/share/franka_description//meshes/robot_ee/franka_hand_white/visual/finger.dae
+[10.533s] -- Symlinking: /home/raiaan/franka_ros2_ws/install/franka_description/share/franka_description//meshes/robot_ee/franka_hand_white/visual/hand.dae
+[10.544s] -- Symlinking: /home/raiaan/franka_ros2_ws/install/franka_description/share/franka_description//rviz/visualize_franka.rviz
+[10.557s] -- Symlinking: /home/raiaan/franka_ros2_ws/install/franka_description/share/franka_description//rviz/visualize_franka_duo.rviz
+[10.568s] -- Symlinking: /home/raiaan/franka_ros2_ws/install/franka_description/share/ament_index/resource_index/package_run_dependencies/franka_description
+[10.579s] -- Symlinking: /home/raiaan/franka_ros2_ws/install/franka_description/share/ament_index/resource_index/parent_prefix_path/franka_description
+[10.593s] -- Symlinking: /home/raiaan/franka_ros2_ws/install/franka_description/share/franka_description/environment/ament_prefix_path.sh
+[10.604s] -- Symlinking: /home/raiaan/franka_ros2_ws/install/franka_description/share/franka_description/environment/ament_prefix_path.dsv
+[10.613s] -- Symlinking: /home/raiaan/franka_ros2_ws/install/franka_description/share/franka_description/environment/path.sh
+[10.622s] -- Symlinking: /home/raiaan/franka_ros2_ws/install/franka_description/share/franka_description/environment/path.dsv
+[10.631s] -- Symlinking: /home/raiaan/franka_ros2_ws/install/franka_description/share/franka_description/local_setup.bash
+[10.640s] -- Symlinking: /home/raiaan/franka_ros2_ws/install/franka_description/share/franka_description/local_setup.sh
+[10.649s] -- Symlinking: /home/raiaan/franka_ros2_ws/install/franka_description/share/franka_description/local_setup.zsh
+[10.658s] -- Symlinking: /home/raiaan/franka_ros2_ws/install/franka_description/share/franka_description/local_setup.dsv
+[10.667s] -- Symlinking: /home/raiaan/franka_ros2_ws/install/franka_description/share/franka_description/package.dsv
+[10.677s] -- Symlinking: /home/raiaan/franka_ros2_ws/install/franka_description/share/ament_index/resource_index/packages/franka_description
+[10.686s] -- Symlinking: /home/raiaan/franka_ros2_ws/install/franka_description/share/franka_description/cmake/franka_descriptionConfig.cmake
+[10.695s] -- Symlinking: /home/raiaan/franka_ros2_ws/install/franka_description/share/franka_description/cmake/franka_descriptionConfig-version.cmake
+[10.703s] -- Symlinking: /home/raiaan/franka_ros2_ws/install/franka_description/share/franka_description/package.xml
+[10.714s] Invoked command in '/home/raiaan/franka_ros2_ws/build/franka_description' returned '0': CMAKE_PREFIX_PATH=/opt/ros/humble /usr/bin/cmake --install /home/raiaan/franka_ros2_ws/build/franka_description

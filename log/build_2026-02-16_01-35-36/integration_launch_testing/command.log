@@ -1,0 +1,4 @@
+Invoking command in '/home/raiaan/franka_ros2_ws/build/integration_launch_testing': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/opt/ros/humble /usr/bin/cmake --build /home/raiaan/franka_ros2_ws/build/integration_launch_testing -- -j6 -l6
+Invoked command in '/home/raiaan/franka_ros2_ws/build/integration_launch_testing' returned '0': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/opt/ros/humble /usr/bin/cmake --build /home/raiaan/franka_ros2_ws/build/integration_launch_testing -- -j6 -l6
+Invoking command in '/home/raiaan/franka_ros2_ws/build/integration_launch_testing': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/opt/ros/humble /usr/bin/cmake --install /home/raiaan/franka_ros2_ws/build/integration_launch_testing
+Invoked command in '/home/raiaan/franka_ros2_ws/build/integration_launch_testing' returned '0': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/opt/ros/humble /usr/bin/cmake --install /home/raiaan/franka_ros2_ws/build/integration_launch_testing

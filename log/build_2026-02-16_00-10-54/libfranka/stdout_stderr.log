@@ -1,0 +1,163 @@
+-- pinocchio_default FOUND. pinocchio_default at /opt/ros/humble/lib/x86_64-linux-gnu/libpinocchio_default.so
+-- pinocchio_parsers FOUND. pinocchio_parsers at /opt/ros/humble/lib/x86_64-linux-gnu/libpinocchio_parsers.so
+-- boost_filesystem FOUND. boost_filesystem at /lib/x86_64-linux-gnu/libboost_filesystem.so
+-- Found Boost: /usr/include (found version "1.74.0") found components: filesystem serialization system 
+-- eigenpy FOUND. eigenpy at /opt/ros/humble/lib/x86_64-linux-gnu/libeigenpy.so
+-- PythonLibraryDirs: 
+-- PythonLibVersionString: 3.10.12
+-- Python site lib: lib/python3.10/site-packages
+-- Python include dirs: /usr/include/python3.10
+-- Checking for NumPy
+--   NUMPY_INCLUDE_DIRS=/usr/lib/python3/dist-packages/numpy/core/include
+--   NUMPY_VERSION=1.21.5
+-- NumPy include dir: /usr/lib/python3/dist-packages/numpy/core/include
+[33mCMake Warning at /usr/share/cmake-3.22/Modules/FindBoost.cmake:2201 (message):
+  No header defined for python310; skipping header check (note: header-only
+  libraries have no designated component)
+Call Stack (most recent call first):
+  /opt/ros/humble/lib/x86_64-linux-gnu/cmake/eigenpy/boost.cmake:148 (find_package)
+  /opt/ros/humble/lib/x86_64-linux-gnu/cmake/eigenpy/eigenpyConfig.cmake:149 (SEARCH_FOR_BOOST_PYTHON)
+  /usr/share/cmake-3.22/Modules/CMakeFindDependencyMacro.cmake:47 (find_package)
+  /opt/ros/humble/lib/x86_64-linux-gnu/cmake/pinocchio/pinocchioConfig.cmake:161 (find_dependency)
+  CMakeLists.txt:54 (find_package)
+
+[0m
+-- Found Boost: /usr/include (found version "1.74.0") found components: python310 
+-- Default C++ standard: 201703
+-- C++ standard sufficient: Minimal required 11, currently defined: 17
+-- hpp-fcl FOUND. hpp-fcl at /opt/ros/humble/lib/x86_64-linux-gnu/libhpp-fcl.so
+-- Found Boost: /usr/include (found version "1.74.0") found components: chrono serialization filesystem 
+-- C++ standard sufficient: Minimal required 11, currently defined: 17
+-- C++ standard sufficient: Minimal required 11, currently defined: 17
+-- Found fmt: 8.1.1
+-- Found fmt: 8.1.1
+-- .git directory found, setting version from latest git tag
+-- libfranka version: 0.20.4, Package tag: 0.20.4
+-- Configuring done
+-- Generating done
+-- Build files have been written to: /home/raiaan/franka_ros2_ws/build/libfranka
+[35m[1mConsolidate compiler generated dependencies of target franka[0m
+[ 37%] Built target franka
+[35m[1mConsolidate compiler generated dependencies of target examples_common[0m
+[ 40%] Built target examples_common
+[35m[1mConsolidate compiler generated dependencies of target async_position_control[0m
+[35m[1mConsolidate compiler generated dependencies of target cartesian_impedance_control[0m
+[35m[1mConsolidate compiler generated dependencies of target communication_test[0m
+[35m[1mConsolidate compiler generated dependencies of target echo_robot_state[0m
+[35m[1mConsolidate compiler generated dependencies of target generate_cartesian_pose_motion[0m
+[35m[1mConsolidate compiler generated dependencies of target force_control[0m
+[ 42%] Built target async_position_control
+[ 45%] Built target cartesian_impedance_control
+[ 48%] Built target echo_robot_state
+[ 50%] Built target generate_cartesian_pose_motion
+[ 53%] Built target communication_test
+[ 55%] Built target force_control
+[35m[1mConsolidate compiler generated dependencies of target generate_cartesian_velocity_motion[0m
+[35m[1mConsolidate compiler generated dependencies of target generate_cartesian_pose_motion_external_control_loop[0m
+[35m[1mConsolidate compiler generated dependencies of target generate_cartesian_velocity_motion_external_control_loop[0m
+[35m[1mConsolidate compiler generated dependencies of target generate_consecutive_motions[0m
+[35m[1mConsolidate compiler generated dependencies of target generate_elbow_motion[0m
+[35m[1mConsolidate compiler generated dependencies of target generate_joint_position_motion[0m
+[ 58%] Built target generate_cartesian_velocity_motion
+[ 61%] Built target generate_cartesian_pose_motion_external_control_loop
+[ 66%] Built target generate_elbow_motion
+[ 66%] Built target generate_cartesian_velocity_motion_external_control_loop
+[35m[1mConsolidate compiler generated dependencies of target generate_joint_position_motion_external_control_loop[0m
+[ 68%] Built target generate_consecutive_motions
+[35m[1mConsolidate compiler generated dependencies of target generate_joint_velocity_motion_external_control_loop[0m
+[35m[1mConsolidate compiler generated dependencies of target generate_joint_velocity_motion[0m
+[ 71%] Built target generate_joint_position_motion
+[35m[1mConsolidate compiler generated dependencies of target grasp_object[0m
+[35m[1mConsolidate compiler generated dependencies of target joint_point_to_point_motion[0m
+[35m[1mConsolidate compiler generated dependencies of target joint_impedance_control[0m
+[ 75%] Built target generate_joint_velocity_motion
+[ 76%] Built target generate_joint_position_motion_external_control_loop
+[ 79%] Built target grasp_object
+[ 81%] Built target generate_joint_velocity_motion_external_control_loop
+[ 84%] Built target joint_impedance_control
+[ 87%] Built target joint_point_to_point_motion
+[35m[1mConsolidate compiler generated dependencies of target motion_with_control_external_control_loop[0m
+[35m[1mConsolidate compiler generated dependencies of target motion_with_control[0m
+[35m[1mConsolidate compiler generated dependencies of target vacuum_object[0m
+[35m[1mConsolidate compiler generated dependencies of target print_joint_poses[0m
+[35m[1mConsolidate compiler generated dependencies of target logging_example[0m
+[ 89%] Built target motion_with_control_external_control_loop
+[ 92%] Built target motion_with_control
+[ 96%] Built target print_joint_poses
+[ 97%] Built target vacuum_object
+[100%] Built target logging_example
+-- Install configuration: "Release"
+-- Up-to-date: /home/raiaan/franka_ros2_ws/install/libfranka/lib/libfranka.so.0.20.4
+-- Up-to-date: /home/raiaan/franka_ros2_ws/install/libfranka/lib/libfranka.so.0.20
+-- Up-to-date: /home/raiaan/franka_ros2_ws/install/libfranka/lib/libfranka.so
+-- Up-to-date: /home/raiaan/franka_ros2_ws/install/libfranka/include
+-- Up-to-date: /home/raiaan/franka_ros2_ws/install/libfranka/include/franka
+-- Up-to-date: /home/raiaan/franka_ros2_ws/install/libfranka/include/franka/active_control.h
+-- Up-to-date: /home/raiaan/franka_ros2_ws/install/libfranka/include/franka/joint_velocity_limits.h
+-- Up-to-date: /home/raiaan/franka_ros2_ws/install/libfranka/include/franka/vacuum_gripper.h
+-- Up-to-date: /home/raiaan/franka_ros2_ws/install/libfranka/include/franka/control_types.h
+-- Up-to-date: /home/raiaan/franka_ros2_ws/install/libfranka/include/franka/active_motion_generator.h
+-- Up-to-date: /home/raiaan/franka_ros2_ws/install/libfranka/include/franka/active_torque_control.h
+-- Up-to-date: /home/raiaan/franka_ros2_ws/install/libfranka/include/franka/exception.h
+-- Up-to-date: /home/raiaan/franka_ros2_ws/install/libfranka/include/franka/gripper.h
+-- Up-to-date: /home/raiaan/franka_ros2_ws/install/libfranka/include/franka/duration.h
+-- Up-to-date: /home/raiaan/franka_ros2_ws/install/libfranka/include/franka/async_control
+-- Up-to-date: /home/raiaan/franka_ros2_ws/install/libfranka/include/franka/async_control/target_status.hpp
+-- Up-to-date: /home/raiaan/franka_ros2_ws/install/libfranka/include/franka/async_control/async_position_control_handler.hpp
+-- Up-to-date: /home/raiaan/franka_ros2_ws/install/libfranka/include/franka/rate_limiting.h
+-- Up-to-date: /home/raiaan/franka_ros2_ws/install/libfranka/include/franka/logging
+-- Up-to-date: /home/raiaan/franka_ros2_ws/install/libfranka/include/franka/logging/cout_logging_sink.hpp
+-- Up-to-date: /home/raiaan/franka_ros2_ws/install/libfranka/include/franka/logging/logger.hpp
+-- Up-to-date: /home/raiaan/franka_ros2_ws/install/libfranka/include/franka/logging/robot_state_log.hpp
+-- Up-to-date: /home/raiaan/franka_ros2_ws/install/libfranka/include/franka/logging/logging_sink_interface.hpp
+-- Up-to-date: /home/raiaan/franka_ros2_ws/install/libfranka/include/franka/errors.h
+-- Up-to-date: /home/raiaan/franka_ros2_ws/install/libfranka/include/franka/active_control_base.h
+-- Up-to-date: /home/raiaan/franka_ros2_ws/install/libfranka/include/franka/commands
+-- Up-to-date: /home/raiaan/franka_ros2_ws/install/libfranka/include/franka/commands/get_robot_model_command.hpp
+-- Up-to-date: /home/raiaan/franka_ros2_ws/install/libfranka/include/franka/robot.h
+-- Up-to-date: /home/raiaan/franka_ros2_ws/install/libfranka/include/franka/control_tools.h
+-- Up-to-date: /home/raiaan/franka_ros2_ws/install/libfranka/include/franka/robot_state.h
+-- Up-to-date: /home/raiaan/franka_ros2_ws/install/libfranka/include/franka/vacuum_gripper_state.h
+-- Up-to-date: /home/raiaan/franka_ros2_ws/install/libfranka/include/franka/lowpass_filter.h
+-- Up-to-date: /home/raiaan/franka_ros2_ws/install/libfranka/include/franka/robot_model_base.h
+-- Up-to-date: /home/raiaan/franka_ros2_ws/install/libfranka/include/franka/robot_model.h
+-- Up-to-date: /home/raiaan/franka_ros2_ws/install/libfranka/include/franka/gripper_state.h
+-- Up-to-date: /home/raiaan/franka_ros2_ws/install/libfranka/include/franka/model.h
+-- Up-to-date: /home/raiaan/franka_ros2_ws/install/libfranka/include
+-- Up-to-date: /home/raiaan/franka_ros2_ws/install/libfranka/include/research_interface
+-- Up-to-date: /home/raiaan/franka_ros2_ws/install/libfranka/include/research_interface/robot
+-- Up-to-date: /home/raiaan/franka_ros2_ws/install/libfranka/include/research_interface/robot/rbk_types.h
+-- Up-to-date: /home/raiaan/franka_ros2_ws/install/libfranka/include/research_interface/robot/service_types.h
+-- Up-to-date: /home/raiaan/franka_ros2_ws/install/libfranka/include/research_interface/robot/error.h
+-- Up-to-date: /home/raiaan/franka_ros2_ws/install/libfranka/include/research_interface/robot/service_traits.h
+-- Up-to-date: /home/raiaan/franka_ros2_ws/install/libfranka/include/research_interface/gripper
+-- Up-to-date: /home/raiaan/franka_ros2_ws/install/libfranka/include/research_interface/gripper/types.h
+-- Up-to-date: /home/raiaan/franka_ros2_ws/install/libfranka/include/research_interface/vacuum_gripper
+-- Up-to-date: /home/raiaan/franka_ros2_ws/install/libfranka/include/research_interface/vacuum_gripper/types.h
+-- Up-to-date: /home/raiaan/franka_ros2_ws/install/libfranka/lib/cmake/Franka/FrankaConfig.cmake
+-- Up-to-date: /home/raiaan/franka_ros2_ws/install/libfranka/lib/cmake/Franka/FrankaConfigVersion.cmake
+-- Up-to-date: /home/raiaan/franka_ros2_ws/install/libfranka/lib/cmake/Franka/FrankaTargets.cmake
+-- Up-to-date: /home/raiaan/franka_ros2_ws/install/libfranka/lib/cmake/Franka/FrankaTargets-release.cmake
+-- Up-to-date: /home/raiaan/franka_ros2_ws/install/libfranka/bin/async_position_control
+-- Up-to-date: /home/raiaan/franka_ros2_ws/install/libfranka/bin/cartesian_impedance_control
+-- Up-to-date: /home/raiaan/franka_ros2_ws/install/libfranka/bin/communication_test
+-- Up-to-date: /home/raiaan/franka_ros2_ws/install/libfranka/bin/echo_robot_state
+-- Up-to-date: /home/raiaan/franka_ros2_ws/install/libfranka/bin/force_control
+-- Up-to-date: /home/raiaan/franka_ros2_ws/install/libfranka/bin/generate_cartesian_pose_motion
+-- Up-to-date: /home/raiaan/franka_ros2_ws/install/libfranka/bin/generate_cartesian_pose_motion_external_control_loop
+-- Up-to-date: /home/raiaan/franka_ros2_ws/install/libfranka/bin/generate_cartesian_velocity_motion
+-- Up-to-date: /home/raiaan/franka_ros2_ws/install/libfranka/bin/generate_cartesian_velocity_motion_external_control_loop
+-- Up-to-date: /home/raiaan/franka_ros2_ws/install/libfranka/bin/generate_consecutive_motions
+-- Up-to-date: /home/raiaan/franka_ros2_ws/install/libfranka/bin/generate_elbow_motion
+-- Up-to-date: /home/raiaan/franka_ros2_ws/install/libfranka/bin/generate_joint_position_motion
+-- Up-to-date: /home/raiaan/franka_ros2_ws/install/libfranka/bin/generate_joint_position_motion_external_control_loop
+-- Up-to-date: /home/raiaan/franka_ros2_ws/install/libfranka/bin/generate_joint_velocity_motion
+-- Up-to-date: /home/raiaan/franka_ros2_ws/install/libfranka/bin/generate_joint_velocity_motion_external_control_loop
+-- Up-to-date: /home/raiaan/franka_ros2_ws/install/libfranka/bin/grasp_object
+-- Up-to-date: /home/raiaan/franka_ros2_ws/install/libfranka/bin/joint_impedance_control
+-- Up-to-date: /home/raiaan/franka_ros2_ws/install/libfranka/bin/joint_point_to_point_motion
+-- Up-to-date: /home/raiaan/franka_ros2_ws/install/libfranka/bin/motion_with_control
+-- Up-to-date: /home/raiaan/franka_ros2_ws/install/libfranka/bin/motion_with_control_external_control_loop
+-- Up-to-date: /home/raiaan/franka_ros2_ws/install/libfranka/bin/print_joint_poses
+-- Up-to-date: /home/raiaan/franka_ros2_ws/install/libfranka/bin/vacuum_object
+-- Up-to-date: /home/raiaan/franka_ros2_ws/install/libfranka/bin/logging_example
