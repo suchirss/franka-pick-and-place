@@ -15,6 +15,7 @@ class WebcamAcquisition:
         cls._instance._num_frames = num_frames
         cls._instance._src = src
         cls._instance._wait_time_s = wait_time_s
+        cls._instance._frame = None
 
         # initialize webcam when class instance is created
         cls._instance._initialize_webcam()
@@ -26,12 +27,16 @@ class WebcamAcquisition:
         if not self._cap.isOpened():
             raise RuntimeError(f"Webcam source failed to open: {self._src}")
 
-    def _read_frame(self):
+    def read_frame(self):
         ret, self._frame = self._cap.read()
         if not ret:
             raise RuntimeError(f"Failed to read frame from src: {self._src}")
 
+        return self._frame
+
     def _display_frame(self):
+        if self._frame is None:
+            raise RuntimeError("No frame available. Call read_frame first")
         cv2.imshow("Output Video Capture", self._frame)
         cv2.waitKey(1)
 
@@ -44,9 +49,9 @@ class WebcamAcquisition:
         print("...\n")
         await asyncio.sleep(self._wait_time_s)
 
-    async def read_forever(self):
+    async def read_num_frames(self):
         for _ in range(self._num_frames):
-            self._read_frame()
+            self.read_frame()
             self._display_frame()
             await self._wait_async()
 
@@ -55,4 +60,4 @@ class WebcamAcquisition:
 
 if __name__ == "__main__":
     webcam_instance = WebcamAcquisition()
-    asyncio.run(webcam_instance.read_forever())
+    asyncio.run(webcam_instance.read_num_frames())
