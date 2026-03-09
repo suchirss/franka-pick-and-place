@@ -2,7 +2,7 @@
 This repository branch contains the ROS 2 Humble development environment and MoveIt 2 configurations for the Franka Emika FR3 robot. The setup is optimized for WSL2 (Ubuntu 22.04) environments and is designed to interface with the project's computer vision modules.
 * **Simulation:** Provides a stable MoveIt 2 environment using `fake_hardware` for trajectory validation.
 * **Robot Logic:** Contains the `franka_pick_place` package for implementing pick-and-place task execution.
-* **Physical Constraints:** Enforces safety limits based on the FR3 datasheet, including the 855mm reach, 83mm maximum gripper width, and $A4$ joint limits of $-176^\circ$ to $-4^\circ$.
+* **Physical Constraints:** Will enforce safety limits based on the FR3 datasheet, including the 855mm reach, 83mm maximum gripper width, and $A4$ joint limits of $-176^\circ$ to $-4^\circ$.
 
 ## Setup
 Teammates joining this branch are recommended to follow these procedures within a WSL terminal to initialize the workspace.
