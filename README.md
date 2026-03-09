@@ -35,6 +35,13 @@ source install/setup.bash
 ### Running the Simulation
 Execute the following command to initialize the FR3 model in RViz with the MoveIt 2 planning scene and fake hardware controllers active.
 ```bash
+# Source ROS 2 Humble system
+source /opt/ros/humble/setup.bash
+
+# Source your local Franka workspace
+source ~/franka_ros2_ws/install/setup.bash
+
+# Launch the simulation
 ros2 launch franka_fr3_moveit_config moveit.launch.py
   robot_ip:=dont-care use_fake_hardware:=true
 ```
