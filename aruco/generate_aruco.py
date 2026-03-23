@@ -1,8 +1,11 @@
 """
 generate_aruco.py
 
-This program generates valid ArUco marker images using OpenCV's predefined
-ArUco dictionaries. A marker can be created in three different ways:
+This program generates ArUco marker images using OpenCV's predefined
+ArUco dictionaries. All generated markers include a black detection border
+and an additional white outer margin for improved visibility and printing.
+
+Markers can be created in four different ways:
 
 1. --random
    Selects a random valid marker ID from the chosen predefined OpenCV ArUco
@@ -11,7 +14,10 @@ ArUco dictionaries. A marker can be created in three different ways:
 2. --id
    Directly generates the specified predefined OpenCV ArUco marker ID.
 
-3. --bits
+3. --range START END
+   Generates all marker IDs in the inclusive range [START, END].
+
+4. --bits
    Interprets the provided bitstream as a direct payload grid in row-major
    order: top-to-bottom, left-to-right.
 
@@ -29,29 +35,39 @@ ArUco dictionaries. A marker can be created in three different ways:
        1 = white cell
        0 = black cell
 
-   The generated image includes a standard black border around the payload.
+   The generated image includes a standard black border around the payload
+   and a white outer margin.
+
+Output:
+- All generated images are saved in the "markers/" directory.
+- Filenames:
+    marker_<id>.png        (for id, random, and range modes)
+    marker_bits.png       (for bits mode)
 
 Notes:
-- The --id and --random modes generate valid predefined ArUco markers.
+- The --id, --random, and --range modes generate valid predefined ArUco markers.
 - The --bits mode generates an image with the exact requested bit pattern,
   but it is NOT guaranteed to be a valid marker from a predefined ArUco
   dictionary, so OpenCV ArUco detection may not recognize it as such.
 
 Examples:
 python generate_aruco.py --random
-python generate_aruco.py --dict DICT_4X4_250 --random --size 800 --out marker.png --show
+python generate_aruco.py --dict DICT_4X4_250 --random --size 800 --show
 
 python generate_aruco.py --id 23
-python generate_aruco.py --dict DICT_4X4_250 --id 23 --size 800 --out marker.png --show
+python generate_aruco.py --dict DICT_4X4_250 --id 23 --size 800 --show
+
+python generate_aruco.py --range 0 9
+python generate_aruco.py --dict DICT_4X4_250 --range 0 9 --size 800
 
 python generate_aruco.py --bits 1010010110100101
-python generate_aruco.py --dict DICT_4X4_250 --bits 1010010110100101 --size 800 --out marker.png --show
+python generate_aruco.py --dict DICT_4X4_250 --bits 1010010110100101 --size 800 --show
 """
 
+import os
 import argparse
 import secrets
 import sys
-
 import cv2
 import numpy as np
 
@@ -64,8 +80,6 @@ def get_aruco_dict(dict_name: str):
     return aruco.getPredefinedDictionary(getattr(aruco, dict_name))
 
 def dict_marker_size_from_name(dict_name: str) -> int | None:
-    # Parses "DICT_4X4_250" -> 4
-    # Returns None if not in that format.
     parts = dict_name.split("_")
     if len(parts) >= 2 and "X" in parts[1]:
         try:
@@ -77,37 +91,33 @@ def dict_marker_size_from_name(dict_name: str) -> int | None:
     return None
 
 def normalize_bits(bit_str: str) -> str:
-    # Keep only 0/1; tolerate spaces/newlines/commas/slashes.
     return "".join(c for c in bit_str if c in "01")
 
 def generate_marker_image(aruco_dict, marker_id: int, side_px: int, border_bits: int):
-    # Compatibility across OpenCV builds:
-    if hasattr(cv2.aruco, "drawMarker"):
-        img = np.zeros((side_px, side_px), dtype=np.uint8)
-        cv2.aruco.drawMarker(aruco_dict, marker_id, side_px, img, border_bits)
-        return img
+    """
+    Generate ArUco marker using OpenCV and add a white outer border.
+    """
+    marker = cv2.aruco.generateImageMarker(aruco_dict, marker_id, side_px)
+    border_px = max(10, side_px // 10)
 
-    # Newer API has generateImageMarker; borderBits kw support varies
-    try:
-        return cv2.aruco.generateImageMarker(aruco_dict, marker_id, side_px, borderBits=border_bits)
-    except TypeError:
-        return cv2.aruco.generateImageMarker(aruco_dict, marker_id, side_px)
+    marker_with_border = cv2.copyMakeBorder(
+        marker,
+        border_px,
+        border_px,
+        border_px,
+        border_px,
+        cv2.BORDER_CONSTANT,
+        value=255
+    )
+
+    return marker_with_border
+
 
 def bits_to_grid(bits: str, msize: int) -> np.ndarray:
-    # Row-major: top-to-bottom, left-to-right
     vals = [1 if c == "1" else 0 for c in bits]
     return np.array(vals, dtype=np.uint8).reshape((msize, msize))
 
 def generate_custom_bits_marker(bits: str, msize: int, side_px: int, border_bits: int) -> np.ndarray:
-    """
-    Render a custom marker image from a payload bitstring.
-
-    Conventions:
-    - bits are read row-major: top-to-bottom, left-to-right
-    - 1 = white payload cell
-    - 0 = black payload cell
-    - border is black
-    """
     grid = bits_to_grid(bits, msize)
 
     total_modules = msize + 2 * border_bits
@@ -117,13 +127,8 @@ def generate_custom_bits_marker(bits: str, msize: int, side_px: int, border_bits
     if module_px <= 0:
         raise ValueError("Image size too small for marker grid and border.")
 
-    # Start with white image, then paint border/data
-    img = np.full((actual_side, actual_side), 255, dtype=np.uint8)
+    img = np.zeros((actual_side, actual_side), dtype=np.uint8)
 
-    # Paint full marker area black first so border is black by default
-    img[:, :] = 0
-
-    # Paint payload cells
     for r in range(msize):
         for c in range(msize):
             y0 = (r + border_bits) * module_px
@@ -136,9 +141,19 @@ def generate_custom_bits_marker(bits: str, msize: int, side_px: int, border_bits
             else:
                 img[y0:y1, x0:x1] = 0
 
-    # Resize to exact requested size if integer division trimmed a few pixels
     if actual_side != side_px:
         img = cv2.resize(img, (side_px, side_px), interpolation=cv2.INTER_NEAREST)
+
+    border_px = max(10, side_px // 10)
+    img = cv2.copyMakeBorder(
+        img,
+        border_px,
+        border_px,
+        border_px,
+        border_px,
+        cv2.BORDER_CONSTANT,
+        value=255
+    )
 
     return img
 
@@ -152,18 +167,10 @@ def rotate_grid_90_cw(grid: np.ndarray) -> np.ndarray:
     return np.rot90(grid, k=3)
 
 def render_marker_to_grid(aruco_dict, marker_id: int, msize: int, border_bits: int = 1) -> np.ndarray:
-    """
-    Render a predefined marker and sample its inner payload grid.
-
-    Returns:
-        msize x msize array of 0/1 where:
-        1 = white cell
-        0 = black cell
-    """
     total_modules = msize + 2 * border_bits
-    side_px = total_modules * 20  # large enough for clean sampling
+    side_px = total_modules * 20
 
-    img = generate_marker_image(aruco_dict, marker_id, side_px, border_bits)
+    img = cv2.aruco.generateImageMarker(aruco_dict, marker_id, side_px)
 
     module_px = side_px // total_modules
     grid = np.zeros((msize, msize), dtype=np.uint8)
@@ -210,29 +217,46 @@ def main():
     g = p.add_mutually_exclusive_group(required=True)
     g.add_argument("--id", type=int, help="Explicit marker ID from predefined dictionary")
     g.add_argument("--random", action="store_true", help="Generate a random valid predefined marker ID")
-    g.add_argument("--bits", type=str, help="Direct payload bitstream, interpreted top-to-bottom, left-to-right")
+    g.add_argument("--bits", type=str, help="Direct payload bitstream")
+    g.add_argument("--range", nargs=2, type=int, metavar=("START", "END"), help="Generate a range of marker IDs (inclusive)")
 
     args = p.parse_args()
-
     aruco_dict = get_aruco_dict(args.dict)
     num_markers = int(aruco_dict.bytesList.shape[0])
-
     marker = None
     mode = None
+    output_dir = "markers"
+    os.makedirs(output_dir, exist_ok=True)
 
-    if args.random:
+    if args.range is not None:
+        start_id, end_id = args.range
+
+        if start_id < 0 or end_id >= num_markers or start_id > end_id:
+            raise ValueError(f"--range must be within [0, {num_markers - 1}] and START <= END")
+
+        print(f"Generating markers from {start_id} to {end_id}")
+
+        for marker_id in range(start_id, end_id + 1):
+            marker = generate_marker_image(aruco_dict, marker_id, args.size, args.border)
+
+            filename = os.path.join(output_dir, f"marker_{marker_id}.png")
+            cv2.imwrite(filename, marker)
+            print(f"wrote={filename}")
+
+        print("mode=range")
+        return
+
+    elif args.random:
         marker_id = secrets.randbelow(num_markers)
         marker = generate_marker_image(aruco_dict, marker_id, args.size, args.border)
         mode = "random"
 
     elif args.bits is not None:
         msize = dict_marker_size_from_name(args.dict)
-        if msize is None:
-            raise ValueError(f"Can't infer marker size from dict '{args.dict}'. Use a DICT_4X4_* dict for bitstreams.")
         bits = normalize_bits(args.bits)
         expected = msize * msize
         if len(bits) != expected:
-            raise ValueError(f"--bits must contain exactly {expected} bits for {args.dict} (got {len(bits)}).")
+            raise ValueError(f"--bits must contain exactly {expected} bits for {args.dict} (got {len(bits)})")
         marker = generate_custom_bits_marker(bits, msize, args.size, args.border)
         mode = "bits"
 
@@ -246,44 +270,24 @@ def main():
 
     else:
         marker_id = int(args.id)
-        if marker_id < 0 or marker_id >= num_markers:
-            raise ValueError(f"--id must be in [0, {num_markers - 1}] for {args.dict}.")
         marker = generate_marker_image(aruco_dict, marker_id, args.size, args.border)
         mode = "id"
 
-    out_name = args.out
-    if out_name is None:
-        if mode == "bits":
-            out_name = f"marker_bits_{args.dict}.png"
-        else:
-            out_name = f"marker_{args.dict}_{marker_id}.png"
-
-    ok = cv2.imwrite(out_name, marker)
-    if not ok:
-        raise RuntimeError(f"Failed to write {out_name}")
+    if mode == "bits":
+        out_name = args.out or f"marker_bits.png"
+    else:
+        out_name = args.out or f"marker_{marker_id}.png"
+    
+    out_path = os.path.join(output_dir, out_name)
+    cv2.imwrite(out_path, marker)
 
     print(f"mode={mode}")
-    print(f"dict={args.dict} numMarkers={num_markers} borderBits={args.border}")
-
-    if mode == "bits":
-        bits = normalize_bits(args.bits)
-        print(f"bits={bits}")
-        print_bit_grid(bits, dict_marker_size_from_name(args.dict))
-        print("note=bits mode renders the exact payload pattern; it is not guaranteed to be a valid predefined ArUco marker")
-    else:
-        print(f"marker_id={marker_id}")
-
-    print(f"wrote={out_name}")
+    print(f"wrote={out_path}")
 
     if args.show:
-        title = f"Custom Bits Marker" if mode == "bits" else f"ArUco {marker_id}"
-        cv2.imshow(title, marker)
+        cv2.imshow("Marker", marker)
         cv2.waitKey(0)
         cv2.destroyAllWindows()
 
 if __name__ == "__main__":
-    try:
-        main()
-    except Exception as e:
-        print(f"ERROR: {e}", file=sys.stderr)
-        sys.exit(2)
+    main()
