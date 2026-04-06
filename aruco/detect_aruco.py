@@ -33,9 +33,11 @@ import signal
 import sys
 from collections import deque
 from ultralytics import YOLO
+from cv_transform.warp_plane import WarpPlane
 
 yolo_model = YOLO('yolov8n.pt')
 show_yolo = True
+
 
 # ------------------- MarkerTracker Class -------------------
 class MarkerTracker:
@@ -278,6 +280,9 @@ def detect_aruco_grid_and_cube(marker_size_m=MARKER_SIZE_M):
     aruco_dict = cv2.aruco.getPredefinedDictionary(ARUCO_DICT)
     detector = cv2.aruco.ArucoDetector(aruco_dict, cv2.aruco.DetectorParameters())
     tracker = MarkerTracker(max_path_length=100)
+    warp_manager = WarpPlane()
+    show_grid = True
+    show_warped = False
 
     try:
         pipeline = rs.pipeline()
@@ -286,9 +291,11 @@ def detect_aruco_grid_and_cube(marker_size_m=MARKER_SIZE_M):
         pipeline.start(config)
     except Exception as e:
         print(f"[ERROR] Could not start RealSense camera: {e}")
+        warp_manager.destroy_warp_plane_instance()
         return
 
     print("[INFO] Press 'q' to quit, 's' to save screenshot.")
+    print("[INFO] Press 'g' to toggle grid overlay, 'w' to toggle warped view.")
     screenshot_count = 0
 
     while True:
@@ -306,6 +313,12 @@ def detect_aruco_grid_and_cube(marker_size_m=MARKER_SIZE_M):
             cv2.aruco.drawDetectedMarkers(frame, corners, ids)
             rvecs, tvecs, _ = estimate_pose_single_markers(corners, marker_size_m,
                                                            camera_matrix, dist_coeffs)
+
+            if not warp_manager.is_calibrated:
+                if warp_manager.compute_homography(corners, ids):
+                    print("[INFO] Grid homography completed successfully")
+                else:
+                    print("[WARN] Not enough grid markers visible for homography")
 
             # Find top-left grid marker (ID 15) to define origin
             origin_idx = None
@@ -326,6 +339,22 @@ def detect_aruco_grid_and_cube(marker_size_m=MARKER_SIZE_M):
                     cv2.putText(frame, text, tuple(corner_center), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0,255,0), 2)
                     distance = np.linalg.norm(rel_pos)
                     print(f"Cube ID {marker_id}: distance from origin = {distance:.2f} m, x={rel_pos[0]:.2f} m, y={rel_pos[1]:.2f} m, z={rel_pos[2]:.2f} m")
+
+                    if warp_manager.is_calibrated:
+                        center_px = corners[i][0].mean(axis=0)
+                        grid_pos = warp_manager.pixel_to_grid(center_px[0], center_px[1])
+                        grid_cell = warp_manager.pixel_to_grid_cell(center_px[0], center_px[1])
+
+                        if grid_pos and grid_cell:
+                            grid_text = f"Cell: ({grid_cell[0]}, {grid_cell[1]})"
+                            cv2.putText(frame, grid_text, (corner_center[0], corner_center[1] + 20), cv2.
+                                        FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 255), 2)
+
+                            print(f"Grid cell ({grid_cell[0]}, {grid_cell[1]}), " f"continuous ({grid_pos[0]:.2f}, "
+                                  f"{grid_pos[1]:.2f})")
+
+            if show_grid and warp_manager.is_calibrated:
+                warp_manager.draw_grid_overlay(frame)
 
         else:
             cv2.putText(frame, 'No markers detected', (10, 30),
@@ -348,9 +377,28 @@ def detect_aruco_grid_and_cube(marker_size_m=MARKER_SIZE_M):
                     continue
                 cv2.rectangle(frame, (x1, y1), (x2, y2), (0,255,0), 2)
                 label = f"{yolo_model.names[cls]}:{conf:.2f}"
+
+                if warp_manager.is_calibrated:
+                    cx, cy = (x1 + x2) // 2, (y1 + y2) // 2
+                    cell = warp_manager.pixel_to_grid_cell(cx, cy)
+                    if cell:
+                        label += f" @({cell[0]}, {cell[1]})"
+
                 cv2.putText(frame, label, (x1, y1-5), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0,0,0), 1)
 
         cv2.imshow("ArUco Cube Tracking", frame)
+
+        if show_warped and warp_manager.is_calibrated:
+            warped = warp_manager.warp_frame(frame)
+            if warped is not None:
+                cv2.imshow("Grid Normalized, Top Down View", warped)
+            elif not show_warped:
+                try:
+                    cv2.destroyWindow("Grid Normalized, Top Down View")
+                except cv2.error:
+                    pass
+
+
         key = cv2.waitKey(1) & 0xFF
         if key == ord('q'):
             break
@@ -363,8 +411,25 @@ def detect_aruco_grid_and_cube(marker_size_m=MARKER_SIZE_M):
             show_yolo = not show_yolo
             print(f"YOLO detection: {'ON' if show_yolo else 'OFF'}")
 
+        elif key == ord('g'):
+            show_grid = not show_grid
+            print(f"Grid overlay: {'ON' if show_grid else 'OFF'}")
+        elif key == ord('w'):
+            show_warped = not show_warped
+            print(f"Warped view: {'ON' if show_warped else 'OFF'}")
+        elif key == ord('r'):
+            if ids is not None and len(ids) > 0:
+                warp_manager._homography = None
+                warp_manager._inverse_homography = None
+                if warp_manager.compute_homography(corners, ids):
+                    print("[INFO] Homography has been recalibrated")
+                else:
+                    print("[WARN] Recalibration failed: not enough grid markers")
+
     pipeline.stop()
+    warp_manager.destroy_warp_plane_instance()
     cv2.destroyAllWindows()
+
 
 # --------------------------- Main Menu ---------------------------
 def main():
