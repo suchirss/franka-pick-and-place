@@ -32,11 +32,7 @@ import time
 import signal
 import sys
 from collections import deque
-from ultralytics import YOLO
 from cv_transform.warp_plane import WarpPlane
-
-yolo_model = YOLO('yolov8n.pt')
-show_yolo = True
 
 
 # ------------------- MarkerTracker Class -------------------
@@ -272,7 +268,6 @@ def estimate_pose_single_markers(corners, marker_size, camera_matrix, dist_coeff
 
 def detect_aruco_grid_and_cube(marker_size_m=MARKER_SIZE_M):
     """Detect ArUco grid and cube markers using RealSense D415."""
-    global show_yolo
     camera_matrix, dist_coeffs = load_camera_params()
     if camera_matrix is None:
         return
@@ -366,26 +361,6 @@ def detect_aruco_grid_and_cube(marker_size_m=MARKER_SIZE_M):
             if pos is not None:
                 print(f"Cube {mid}: x={pos[0]:.3f} y={pos[1]:.3f} z={pos[2]:.3f} m")
 
-        if show_yolo:
-            results = yolo_model(frame, verbose=False)
-            boxes = results[0].boxes
-            for box in boxes:
-                x1, y1, x2, y2 = map(int, box.xyxy[0])
-                conf = float(box.conf[0])
-                cls = int(box.cls[0])
-                if conf < 0.5:
-                    continue
-                cv2.rectangle(frame, (x1, y1), (x2, y2), (0,255,0), 2)
-                label = f"{yolo_model.names[cls]}:{conf:.2f}"
-
-                if warp_manager.is_calibrated:
-                    cx, cy = (x1 + x2) // 2, (y1 + y2) // 2
-                    cell = warp_manager.pixel_to_grid_cell(cx, cy)
-                    if cell:
-                        label += f" @({cell[0]}, {cell[1]})"
-
-                cv2.putText(frame, label, (x1, y1-5), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0,0,0), 1)
-
         cv2.imshow("ArUco Cube Tracking", frame)
 
         if show_warped and warp_manager.is_calibrated:
@@ -407,9 +382,6 @@ def detect_aruco_grid_and_cube(marker_size_m=MARKER_SIZE_M):
             cv2.imwrite(filename, frame)
             print(f"[INFO] Screenshot saved: {filename}")
             screenshot_count += 1
-        elif key == ord('y'):
-            show_yolo = not show_yolo
-            print(f"YOLO detection: {'ON' if show_yolo else 'OFF'}")
 
         elif key == ord('g'):
             show_grid = not show_grid
