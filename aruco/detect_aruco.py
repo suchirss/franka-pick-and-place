@@ -91,10 +91,17 @@ def _handle_sigint(signum, frame):
 signal.signal(signal.SIGINT, _handle_sigint)
 
 # --------------------------- Camera Calibration ---------------------------
-def capture_calibration_images(save_dir='calibration_images'):
+def capture_calibration_images(save_dir='aruco\\calibration_images'):
     """Capture checkerboard images using RealSense D415."""
     if not os.path.exists(save_dir):
         os.makedirs(save_dir)
+
+    existing_images = glob.glob(os.path.join(save_dir, '*.jpg'))
+    for image_path in existing_images:
+        os.remove(image_path)
+
+    if existing_images:
+        print(f"[INFO] Cleared {len(existing_images)} existing calibration image(s) from {save_dir}")
 
     try:
         pipeline = rs.pipeline()
@@ -138,7 +145,7 @@ def capture_calibration_images(save_dir='calibration_images'):
     print(f"[INFO] Total images captured: {img_count}")
 
 def calibrate_camera(checkerboard_size=CHECKERBOARD_SIZE, square_size=SQUARE_SIZE,
-                     image_dir='calibration_images', yaml_file='camera_params.yaml'):
+                     image_dir='aruco\\calibration_images', yaml_file='camera_params.yaml'):
     """Calibrate camera using checkerboard images."""
     criteria = (cv2.TERM_CRITERIA_EPS + cv2.TERM_CRITERIA_MAX_ITER, 30, 0.001)
     objp = np.zeros((checkerboard_size[0] * checkerboard_size[1], 3), np.float32)
@@ -202,7 +209,7 @@ def calibrate_camera(checkerboard_size=CHECKERBOARD_SIZE, square_size=SQUARE_SIZ
 
     return mtx, dist
 
-def test_undistortion(yaml_file='camera_params.yaml', image_dir='calibration_images'):
+def test_undistortion(yaml_file='camera_params.yaml', image_dir='aruco\\calibration_images'):
     """Test undistortion using saved calibration parameters."""
     try:
         with open(yaml_file, 'r') as f:
@@ -333,7 +340,6 @@ def detect_aruco_grid_and_cube(marker_size_m=MARKER_SIZE_M):
                     corner_center = corners[i][0].mean(axis=0).astype(int)
                     cv2.putText(frame, text, tuple(corner_center), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0,255,0), 2)
                     distance = np.linalg.norm(rel_pos)
-                    print(f"Cube ID {marker_id}: distance from origin = {distance:.2f} m, x={rel_pos[0]:.2f} m, y={rel_pos[1]:.2f} m, z={rel_pos[2]:.2f} m")
 
                     if warp_manager.is_calibrated:
                         center_px = corners[i][0].mean(axis=0)
