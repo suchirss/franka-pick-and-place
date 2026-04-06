@@ -1,3 +1,10 @@
 .idea/
 *.png
 *.pdf
+*.jpg
+*.jpeg
+
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
