@@ -24,7 +24,7 @@ class WorldNode(Node):
         
         pose = Pose()
         pose.position.x = 0.5 # Change as needed
-        pose.position.z = -0.05 # Change as needed
+        pose.position.z = -0.04 # Change as needed
         
         table.primitives.append(box)
         table.primitive_poses.append(pose)
@@ -42,7 +42,7 @@ class WorldNode(Node):
         c_pose = Pose()
         c_pose.position.x = 0.5
         c_pose.position.y = 0.0
-        c_pose.position.z = 0.025
+        c_pose.position.z = 0.005
         
         cube.primitives.append(c_box)
         cube.primitive_poses.append(c_pose)
