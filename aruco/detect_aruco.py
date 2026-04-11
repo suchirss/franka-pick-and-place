@@ -31,12 +31,16 @@ import glob
 import time
 import signal
 import sys
+import time
 from collections import deque
-from ultralytics import YOLO
 from cv_transform.warp_plane import WarpPlane
 
-yolo_model = YOLO('yolov8n.pt')
-show_yolo = True
+if os.name == "nt":
+    import msvcrt
+else:
+    import select
+    import termios
+    import tty
 
 
 # ------------------- MarkerTracker Class -------------------
@@ -95,10 +99,17 @@ def _handle_sigint(signum, frame):
 signal.signal(signal.SIGINT, _handle_sigint)
 
 # --------------------------- Camera Calibration ---------------------------
-def capture_calibration_images(save_dir='calibration_images'):
+def capture_calibration_images(save_dir='aruco\\calibration_images'):
     """Capture checkerboard images using RealSense D415."""
     if not os.path.exists(save_dir):
         os.makedirs(save_dir)
+
+    existing_images = glob.glob(os.path.join(save_dir, '*.jpg'))
+    for image_path in existing_images:
+        os.remove(image_path)
+
+    if existing_images:
+        print(f"[INFO] Cleared {len(existing_images)} existing calibration image(s) from {save_dir}")
 
     try:
         pipeline = rs.pipeline()
@@ -142,7 +153,7 @@ def capture_calibration_images(save_dir='calibration_images'):
     print(f"[INFO] Total images captured: {img_count}")
 
 def calibrate_camera(checkerboard_size=CHECKERBOARD_SIZE, square_size=SQUARE_SIZE,
-                     image_dir='calibration_images', yaml_file='camera_params.yaml'):
+                     image_dir='aruco\\calibration_images', yaml_file='camera_params.yaml'):
     """Calibrate camera using checkerboard images."""
     criteria = (cv2.TERM_CRITERIA_EPS + cv2.TERM_CRITERIA_MAX_ITER, 30, 0.001)
     objp = np.zeros((checkerboard_size[0] * checkerboard_size[1], 3), np.float32)
@@ -206,7 +217,7 @@ def calibrate_camera(checkerboard_size=CHECKERBOARD_SIZE, square_size=SQUARE_SIZ
 
     return mtx, dist
 
-def test_undistortion(yaml_file='camera_params.yaml', image_dir='calibration_images'):
+def test_undistortion(yaml_file='camera_params.yaml', image_dir='aruco\\calibration_images'):
     """Test undistortion using saved calibration parameters."""
     try:
         with open(yaml_file, 'r') as f:
@@ -272,7 +283,6 @@ def estimate_pose_single_markers(corners, marker_size, camera_matrix, dist_coeff
 
 def detect_aruco_grid_and_cube(marker_size_m=MARKER_SIZE_M):
     """Detect ArUco grid and cube markers using RealSense D415."""
-    global show_yolo
     camera_matrix, dist_coeffs = load_camera_params()
     if camera_matrix is None:
         return
@@ -338,7 +348,6 @@ def detect_aruco_grid_and_cube(marker_size_m=MARKER_SIZE_M):
                     corner_center = corners[i][0].mean(axis=0).astype(int)
                     cv2.putText(frame, text, tuple(corner_center), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0,255,0), 2)
                     distance = np.linalg.norm(rel_pos)
-                    print(f"Cube ID {marker_id}: distance from origin = {distance:.2f} m, x={rel_pos[0]:.2f} m, y={rel_pos[1]:.2f} m, z={rel_pos[2]:.2f} m")
 
                     if warp_manager.is_calibrated:
                         center_px = corners[i][0].mean(axis=0)
@@ -366,26 +375,6 @@ def detect_aruco_grid_and_cube(marker_size_m=MARKER_SIZE_M):
             if pos is not None:
                 print(f"Cube {mid}: x={pos[0]:.3f} y={pos[1]:.3f} z={pos[2]:.3f} m")
 
-        if show_yolo:
-            results = yolo_model(frame, verbose=False)
-            boxes = results[0].boxes
-            for box in boxes:
-                x1, y1, x2, y2 = map(int, box.xyxy[0])
-                conf = float(box.conf[0])
-                cls = int(box.cls[0])
-                if conf < 0.5:
-                    continue
-                cv2.rectangle(frame, (x1, y1), (x2, y2), (0,255,0), 2)
-                label = f"{yolo_model.names[cls]}:{conf:.2f}"
-
-                if warp_manager.is_calibrated:
-                    cx, cy = (x1 + x2) // 2, (y1 + y2) // 2
-                    cell = warp_manager.pixel_to_grid_cell(cx, cy)
-                    if cell:
-                        label += f" @({cell[0]}, {cell[1]})"
-
-                cv2.putText(frame, label, (x1, y1-5), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0,0,0), 1)
-
         cv2.imshow("ArUco Cube Tracking", frame)
 
         if show_warped and warp_manager.is_calibrated:
@@ -407,9 +396,6 @@ def detect_aruco_grid_and_cube(marker_size_m=MARKER_SIZE_M):
             cv2.imwrite(filename, frame)
             print(f"[INFO] Screenshot saved: {filename}")
             screenshot_count += 1
-        elif key == ord('y'):
-            show_yolo = not show_yolo
-            print(f"YOLO detection: {'ON' if show_yolo else 'OFF'}")
 
         elif key == ord('g'):
             show_grid = not show_grid
@@ -430,6 +416,106 @@ def detect_aruco_grid_and_cube(marker_size_m=MARKER_SIZE_M):
     warp_manager.destroy_warp_plane_instance()
     cv2.destroyAllWindows()
 
+import os
+import sys
+import time
+
+if os.name == "nt":
+    import msvcrt
+else:
+    import select
+    import termios
+    import tty
+
+
+def _get_key_nonblocking():
+    """
+    Return a single pressed key as lowercase text, or None if no key is ready.
+    Works in the terminal without OpenCV.
+    """
+    if os.name == "nt":
+        if msvcrt.kbhit():
+            ch = msvcrt.getch()
+
+            # Ignore special multi-byte keys like arrows/function keys
+            if ch in (b'\x00', b'\xe0'):
+                if msvcrt.kbhit():
+                    msvcrt.getch()
+                return None
+
+            try:
+                return ch.decode("utf-8", errors="ignore").lower()
+            except Exception:
+                return None
+        return None
+
+    fd = sys.stdin.fileno()
+    old_settings = termios.tcgetattr(fd)
+    try:
+        tty.setcbreak(fd)
+        ready, _, _ = select.select([sys.stdin], [], [], 0)
+        if ready:
+            ch = sys.stdin.read(1)
+            return ch.lower()
+        return None
+    finally:
+        termios.tcsetattr(fd, termios.TCSADRAIN, old_settings)
+
+
+def calibrate_franka_origin():
+    """Terminal-based manual control for calibrating Franka origin."""
+    print("[INFO] Franka manual control started.")
+    print("[INFO]   w = move up")
+    print("[INFO]   a = move left")
+    print("[INFO]   s = move down")
+    print("[INFO]   d = move right")
+    print("[INFO]   r = move out")
+    print("[INFO]   f = move in")
+    print("[INFO]   c = calibrate origin")
+    print("[INFO]   q = return to main menu")
+
+    movement_messages = {
+        'w': "[INFO] Moving Franka up...",
+        'a': "[INFO] Moving Franka left...",
+        's': "[INFO] Moving Franka down...",
+        'd': "[INFO] Moving Franka right...",
+        'r': "[INFO] Moving Franka out...",
+        'f': "[INFO] Moving Franka in...",
+    }
+
+    try:
+        while True:
+            key = _get_key_nonblocking()
+
+            if key is None:
+                time.sleep(0.01)
+                continue
+
+            if key in movement_messages:
+                print(movement_messages[key])
+
+            elif key == 'c':
+                print("[INFO] Calibrating Franka origin...")
+                break
+
+            elif key == 'q':
+                print("[INFO] Returning to main menu...")
+                break
+
+    except KeyboardInterrupt:
+        print("\n[INFO] Returning to main menu...")
+
+def franka_pick_and_place():
+    """Franka pick and place operation."""
+    print("[INFO] Input a grid cell to place the cube")
+    row = input("Enter cell row: ").strip().upper()
+    col = input("Enter cell column: ").strip().upper()
+    print(f"[INFO] Grid cell selection ({row}, {col})...")
+    choice = input("Confirm pick and place operation? (y/n): ").strip().lower()
+    if choice == 'y':
+        print(f"[INFO] Executing pick and place to cell ({row}, {col})...")
+    if choice == 'n':
+        print("[INFO] Operation cancelled.")
 
 # --------------------------- Main Menu ---------------------------
 def main():
@@ -439,8 +525,10 @@ def main():
         print("2. Calibrate camera")
         print("3. Test undistortion")
         print("4. Detect cube on ArUco grid (live feed)")
-        print("5. Exit")
-        choice = input("Enter choice (1-5): ")
+        print("5. Calibrate Franka origin")
+        print("6. Franka Pick and Place")
+        print("7. Exit")
+        choice = input("Enter choice (1-7): ")
 
         if choice == '1':
             capture_calibration_images()
@@ -451,10 +539,14 @@ def main():
         elif choice == '4':
             detect_aruco_grid_and_cube()
         elif choice == '5':
+            calibrate_franka_origin()
+        elif choice == '6':
+            franka_pick_and_place()
+        elif choice == '7':
             print("[INFO] Exiting...")
             break
         else:
-            print("[WARN] Invalid choice. Please enter 1-5.")
+            print("[WARN] Invalid choice. Please enter 1-7.")
 
 if __name__ == '__main__':
     main()
