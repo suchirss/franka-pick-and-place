@@ -31,8 +31,16 @@ import glob
 import time
 import signal
 import sys
+import time
 from collections import deque
 from cv_transform.warp_plane import WarpPlane
+
+if os.name == "nt":
+    import msvcrt
+else:
+    import select
+    import termios
+    import tty
 
 
 # ------------------- MarkerTracker Class -------------------
@@ -408,6 +416,106 @@ def detect_aruco_grid_and_cube(marker_size_m=MARKER_SIZE_M):
     warp_manager.destroy_warp_plane_instance()
     cv2.destroyAllWindows()
 
+import os
+import sys
+import time
+
+if os.name == "nt":
+    import msvcrt
+else:
+    import select
+    import termios
+    import tty
+
+
+def _get_key_nonblocking():
+    """
+    Return a single pressed key as lowercase text, or None if no key is ready.
+    Works in the terminal without OpenCV.
+    """
+    if os.name == "nt":
+        if msvcrt.kbhit():
+            ch = msvcrt.getch()
+
+            # Ignore special multi-byte keys like arrows/function keys
+            if ch in (b'\x00', b'\xe0'):
+                if msvcrt.kbhit():
+                    msvcrt.getch()
+                return None
+
+            try:
+                return ch.decode("utf-8", errors="ignore").lower()
+            except Exception:
+                return None
+        return None
+
+    fd = sys.stdin.fileno()
+    old_settings = termios.tcgetattr(fd)
+    try:
+        tty.setcbreak(fd)
+        ready, _, _ = select.select([sys.stdin], [], [], 0)
+        if ready:
+            ch = sys.stdin.read(1)
+            return ch.lower()
+        return None
+    finally:
+        termios.tcsetattr(fd, termios.TCSADRAIN, old_settings)
+
+
+def calibrate_franka_origin():
+    """Terminal-based manual control for calibrating Franka origin."""
+    print("[INFO] Franka manual control started.")
+    print("[INFO]   w = move up")
+    print("[INFO]   a = move left")
+    print("[INFO]   s = move down")
+    print("[INFO]   d = move right")
+    print("[INFO]   r = move out")
+    print("[INFO]   f = move in")
+    print("[INFO]   c = calibrate origin")
+    print("[INFO]   q = return to main menu")
+
+    movement_messages = {
+        'w': "[INFO] Moving Franka up...",
+        'a': "[INFO] Moving Franka left...",
+        's': "[INFO] Moving Franka down...",
+        'd': "[INFO] Moving Franka right...",
+        'r': "[INFO] Moving Franka out...",
+        'f': "[INFO] Moving Franka in...",
+    }
+
+    try:
+        while True:
+            key = _get_key_nonblocking()
+
+            if key is None:
+                time.sleep(0.01)
+                continue
+
+            if key in movement_messages:
+                print(movement_messages[key])
+
+            elif key == 'c':
+                print("[INFO] Calibrating Franka origin...")
+                break
+
+            elif key == 'q':
+                print("[INFO] Returning to main menu...")
+                break
+
+    except KeyboardInterrupt:
+        print("\n[INFO] Returning to main menu...")
+
+def franka_pick_and_place():
+    """Franka pick and place operation."""
+    print("[INFO] Input a grid cell to place the cube")
+    row = input("Enter cell row: ").strip().upper()
+    col = input("Enter cell column: ").strip().upper()
+    print(f"[INFO] Grid cell selection ({row}, {col})...")
+    choice = input("Confirm pick and place operation? (y/n): ").strip().lower()
+    if choice == 'y':
+        print(f"[INFO] Executing pick and place to cell ({row}, {col})...")
+    if choice == 'n':
+        print("[INFO] Operation cancelled.")
 
 # --------------------------- Main Menu ---------------------------
 def main():
@@ -417,8 +525,10 @@ def main():
         print("2. Calibrate camera")
         print("3. Test undistortion")
         print("4. Detect cube on ArUco grid (live feed)")
-        print("5. Exit")
-        choice = input("Enter choice (1-5): ")
+        print("5. Calibrate Franka origin")
+        print("6. Franka Pick and Place")
+        print("7. Exit")
+        choice = input("Enter choice (1-7): ")
 
         if choice == '1':
             capture_calibration_images()
@@ -429,10 +539,14 @@ def main():
         elif choice == '4':
             detect_aruco_grid_and_cube()
         elif choice == '5':
+            calibrate_franka_origin()
+        elif choice == '6':
+            franka_pick_and_place()
+        elif choice == '7':
             print("[INFO] Exiting...")
             break
         else:
-            print("[WARN] Invalid choice. Please enter 1-5.")
+            print("[WARN] Invalid choice. Please enter 1-7.")
 
 if __name__ == '__main__':
     main()
