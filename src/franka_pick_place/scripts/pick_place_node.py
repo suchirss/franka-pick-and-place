@@ -1,10 +1,12 @@
 #!/usr/bin/env python3
+import copy
 import rclpy
 from rclpy.node import Node
 from geometry_msgs.msg import PoseStamped
 from pymoveit2.moveit2 import MoveIt2
 from rclpy.action import ActionClient
 from control_msgs.action import GripperCommand
+
 
 class FullPickPlaceNode(Node):
     def __init__(self):
@@ -59,64 +61,63 @@ class FullPickPlaceNode(Node):
         rclpy.spin_until_future_complete(self, future)
         return True
 
-    def vision_callback(self, msg):
+def vision_callback(self, msg):
+        
         if self.target_received:
-            return # Only execute once per run
-            
-        self.target_received = True
-        self.get_logger().info("Target acquired! Initiating Pick Sequence.")
-
-        # -- PHASE 0: Open Gripper --
-        self.set_gripper(0.08) # Open to 8cm
-
-        safe_z_height = 0.005 # Center of cube on table
-        hover_z_height = 0.20 # 20cm above table
-        
-        # -- PHASE 1: Pre-Grasp --
-        target_pose = PoseStamped()
-        target_pose.header.frame_id = "fr3_link0"
-        target_pose.pose.position.x = msg.pose.position.x
-        target_pose.pose.position.y = msg.pose.position.y
-        target_pose.pose.position.z = hover_z_height 
-        
-        # Point straight down (180 deg flip around X)
-        target_pose.pose.orientation.x = 1.0
-        target_pose.pose.orientation.w = 0.0
-
-        self.get_logger().info("Moving to Pre-Grasp...")
-        self.moveit2.move_to_pose(target_pose)
-        if not self.moveit2.wait_until_executed():
-            self.get_logger().error("Pre-grasp failed.")
             return
+        
+        self.target_received = True
+        self.get_logger().info("Target acquired from camera! Initiating sequence.")
 
-        # -- PHASE 2: Descend --
-        self.get_logger().info("Descending...")
-        target_pose.pose.position.z = safe_z_height 
-        self.moveit2.move_to_pose(target_pose)
-        self.moveit2.wait_until_executed()
+        # --- THE TAPE-DOWN OFFSETS (IN METERS) ---
+        #TODO
+        # UPDATE !! 
+        board_offset_x = 0.45   # Distance forward to Marker 15
+        board_offset_y = -0.15  # Distance left/right to Marker 15 (Negative = Right)
         
-        # -- PHASE 3: Grasp --
-        self.get_logger().info("Grasping object...")
-        self.set_gripper(0.048, max_effort=30.0) 
+        # 1. Translate Camera Data (Relative to Board) -> Robot Data (Relative to Base)
+        robot_target_x = msg.pose.position.x + board_offset_x
+        robot_target_y = msg.pose.position.y + board_offset_y
         
-        # NOTE FIX: Attach the object to the robot's hand
-        self.get_logger().info("Attaching cube to the planning scene...")
+        # 2. Setup Pre-Grasp Pose (High Z for safety)
+        pre_grasp_pose = PoseStamped()
+        pre_grasp_pose.header.frame_id = "fr3_link0"
         
-        # You need the exact ID you gave the cube in your world_node.py
-        cube_id = "target_cube" 
+        pre_grasp_pose.pose.position.x = robot_target_x
+        pre_grasp_pose.pose.position.y = robot_target_y
+        pre_grasp_pose.pose.position.z = 0.50 # 50cm above the table
         
-        # Attach the cube to the hand link so MoveIt knows they are one object
-        # (Check pymoveit2 documentation for exact syntax, usually it's tied to the PlanningScene)
-        # Pseudocode for the logic:
-        # planning_scene.attach_collision_object(object_id=cube_id, link_name="fr3_hand")
+        # Gripper straight down
+        pre_grasp_pose.pose.orientation.x = 1.0
+        pre_grasp_pose.pose.orientation.y = 0.0
+        pre_grasp_pose.pose.orientation.z = 0.0
+        pre_grasp_pose.pose.orientation.w = 0.0
 
-        # -- PHASE 4: Retreat --
-        self.get_logger().info("Lifting...")
-        target_pose.pose.position.z = hover_z_height 
-        self.moveit2.move_to_pose(target_pose)
-        self.moveit2.wait_until_executed()
+        # 3. Execute Pre-Grasp (if pre-grasp successful, can implement other steps)
+        self.get_logger().info(f"Moving to Pre-Grasp: X={robot_target_x:.3f}, Y={robot_target_y:.3f}")
+        self.moveit2.move_to_pose(pre_grasp_pose)
+        success = self.moveit2.wait_until_executed()
 
-        self.get_logger().info("Pick complete! Ready for drop-off trajectory.")
+        if success:
+            self.get_logger().info("[SUCCESS] Pre-grasp reached. Descending...")
+            
+            # 4. Descend to the table safely
+            safe_z_height = 0.02 
+            # 2cm above the table/base 
+            #TODO # CHANGE TO HIGHER NUMBER FIRST RUN (like 0.20) FOR SAFETY
+            
+            descend_pose = copy.deepcopy(pre_grasp_pose)
+            descend_pose.pose.position.z = safe_z_height 
+            
+            self.moveit2.move_to_pose(descend_pose)
+            self.moveit2.wait_until_executed()
+            
+            self.get_logger().info("Ready to close gripper!")
+            # add close gripper command here later
+            #TODO
+
+        else:
+            self.get_logger().error("Pre-grasp failed. Aborting.")
 
 def main(args=None):
     rclpy.init(args=args)
