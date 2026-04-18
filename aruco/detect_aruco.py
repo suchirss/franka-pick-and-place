@@ -31,12 +31,16 @@ import glob
 import time
 import signal
 import sys
+import time
 from collections import deque
-from ultralytics import YOLO
 from cv_transform.warp_plane import WarpPlane
 
-yolo_model = YOLO('yolov8n.pt')
-show_yolo = True
+if os.name == "nt":
+    import msvcrt
+else:
+    import select
+    import termios
+    import tty
 
 
 # ------------------- MarkerTracker Class -------------------
@@ -76,6 +80,246 @@ class MarkerTracker:
             return self.paths[marker_id][-1]
         return None
 
+
+# ------------------- CubeCenterTracker Class -------------------
+class CubeCenterTracker:
+    """
+    Track the 3D center of a cube using detected ArUco markers.
+    
+    Assumes cube markers (IDs 70-75) are placed at known offsets from the cube center.
+    The marker offsets assume a 1.5-inch cube with markers on top and sides.
+    """
+    
+    # Marker ID to assumed position offset from cube center (in meters, assuming markers at ±0.75 inches = ±0.01905m)
+    # Adjust these based on your actual cube marker layout
+    MARKER_OFFSETS = {
+        70: np.array([ 0.01905,  0.01905,  0.01905]),  # Top-Right-Front
+        71: np.array([-0.01905,  0.01905,  0.01905]),  # Top-Left-Front
+        72: np.array([-0.01905,  0.01905, -0.01905]),  # Top-Left-Back
+        73: np.array([ 0.01905,  0.01905, -0.01905]),  # Top-Right-Back
+        74: np.array([ 0.01905, -0.01905,  0.01905]),  # Bottom-Right-Front
+        75: np.array([-0.01905, -0.01905,  0.01905]),  # Bottom-Left-Front
+    }
+    
+    def __init__(self):
+        """Initialize the cube center tracker."""
+        self.last_cube_center_3d = None
+        self.last_cube_center_pixel = None
+        self.detected_markers = {}  # marker_id -> tvec (3D position)
+    
+    def update_detected_markers(self, marker_ids, tvecs):
+        """
+        Update the set of detected cube markers and their 3D positions.
+        
+        Args:
+            marker_ids: Array of detected marker IDs
+            tvecs: Array of translation vectors (3D positions) for each marker
+        """
+        self.detected_markers.clear()
+        if marker_ids is not None:
+            for i, marker_id in enumerate(marker_ids.flatten()):
+                if marker_id in self.MARKER_OFFSETS:
+                    self.detected_markers[marker_id] = tvecs[i]
+    
+    def calculate_cube_center_3d(self, origin_pos):
+        """
+        Calculate the 3D position of the cube center from detected markers.
+        
+        Strategy: Use marker positions and their known offsets to estimate cube center.
+        For multiple markers, we solve for the cube center that best fits all detections.
+        
+        Args:
+            origin_pos: 3D position of the grid origin (marker ID 15)
+            
+        Returns:
+            Cube center position relative to origin (or None if no markers detected)
+        """
+        if not self.detected_markers:
+            return None
+        
+        # Simple approach: average the back-calculated centers from each marker
+        estimated_centers = []
+        for marker_id, tvec in self.detected_markers.items():
+            offset = self.MARKER_OFFSETS[marker_id]
+            # Cube center = marker position - marker offset
+            estimated_center = tvec - offset
+            estimated_centers.append(estimated_center)
+        
+        if estimated_centers:
+            # Average all estimated centers to reduce error
+            cube_center = np.mean(estimated_centers, axis=0)
+            self.last_cube_center_3d = cube_center
+            
+            # Return relative to origin
+            relative_center = cube_center - origin_pos
+            return relative_center
+        
+        return None
+    
+    def project_cube_center_to_pixel(self, cube_center_3d, camera_matrix, dist_coeffs):
+        """
+        Project the 3D cube center position onto the 2D image plane.
+        
+        Args:
+            cube_center_3d: 3D position of cube center (1x3 or 3x1 array)
+            camera_matrix: Camera intrinsic matrix
+            dist_coeffs: Distortion coefficients
+            
+        Returns:
+            (pixel_x, pixel_y) tuple or None if projection fails
+        """
+        if cube_center_3d is None:
+            return None
+        
+        # Ensure proper shape for cv2.projectPoints
+        points_3d = np.array([cube_center_3d.flatten()], dtype=np.float32)
+        rvec = np.array([0.0, 0.0, 0.0], dtype=np.float32)
+        tvec = np.array([0.0, 0.0, 0.0], dtype=np.float32)
+        
+        try:
+            projected_points, _ = cv2.projectPoints(
+                points_3d, rvec, tvec, camera_matrix, dist_coeffs
+            )
+            pixel_pos = projected_points[0][0]
+            self.last_cube_center_pixel = pixel_pos
+            return float(pixel_pos[0]), float(pixel_pos[1])
+        except Exception as e:
+            print(f"[ERROR] Failed to project cube center: {e}")
+            return None
+    
+    def get_cube_grid_cell(self, warp_manager, camera_matrix, dist_coeffs, origin_pos):
+        """
+        Get the grid cell containing the cube's bottom center.
+        
+        Args:
+            warp_manager: WarpPlane instance for grid mapping
+            camera_matrix: Camera intrinsic matrix
+            dist_coeffs: Distortion coefficients
+            origin_pos: 3D position of grid origin
+            
+        Returns:
+            (grid_row, grid_col) tuple or None if calculation fails
+        """
+        # Calculate cube center in 3D
+        cube_center_3d = self.calculate_cube_center_3d(origin_pos)
+        if cube_center_3d is None:
+            return None
+        
+        # Project to 2D pixel space
+        pixel_pos = self.project_cube_center_to_pixel(cube_center_3d, camera_matrix, dist_coeffs)
+        if pixel_pos is None:
+            return None
+        
+        # Get grid cell from pixel position
+        grid_cell = warp_manager.pixel_to_grid_cell(pixel_pos[0], pixel_pos[1])
+        return grid_cell
+    
+    def get_cube_grid_position(self, warp_manager, camera_matrix, dist_coeffs, origin_pos):
+        """
+        Get the continuous grid coordinates of the cube's bottom center.
+        
+        Args:
+            warp_manager: WarpPlane instance for grid mapping
+            camera_matrix: Camera intrinsic matrix
+            dist_coeffs: Distortion coefficients
+            origin_pos: 3D position of grid origin
+            
+        Returns:
+            (grid_row, grid_col) continuous coordinates or None if calculation fails
+        """
+        # Calculate cube center in 3D
+        cube_center_3d = self.calculate_cube_center_3d(origin_pos)
+        if cube_center_3d is None:
+            return None
+        
+        # Project to 2D pixel space
+        pixel_pos = self.project_cube_center_to_pixel(cube_center_3d, camera_matrix, dist_coeffs)
+        if pixel_pos is None:
+            return None
+        
+        # Get grid position from pixel
+        grid_pos = warp_manager.pixel_to_grid(pixel_pos[0], pixel_pos[1])
+        return grid_pos
+    
+    def get_cube_bottom_3d(self, origin_pos):
+        """
+        Get the 3D position of the cube's bottom center (vertical center offset downward by 0.75 inches).
+        
+        In world coordinates, "downward" means negative Z direction.
+        Offset is 0.75 inches (0.01905 m).
+        
+        Args:
+            origin_pos: 3D position of grid origin
+            
+        Returns:
+            3D position of cube bottom or None if no markers detected
+        """
+        # Get cube center
+        cube_center_3d = self.calculate_cube_center_3d(origin_pos)
+        if cube_center_3d is None:
+            return None
+        
+        # Offset downward by 0.75 inches (half cube height) in negative Z direction
+        CUBE_HEIGHT_OFFSET = 0.01905  # 0.75 inches in meters
+        cube_bottom_3d = cube_center_3d.copy()
+        cube_bottom_3d[2] -= CUBE_HEIGHT_OFFSET  # Move down (negative Z)
+        
+        return cube_bottom_3d
+    
+    def get_cube_bottom_grid_cell(self, warp_manager, camera_matrix, dist_coeffs, origin_pos):
+        """
+        Get the grid cell containing the cube's bottom center.
+        
+        Args:
+            warp_manager: WarpPlane instance for grid mapping
+            camera_matrix: Camera intrinsic matrix
+            dist_coeffs: Distortion coefficients
+            origin_pos: 3D position of grid origin
+            
+        Returns:
+            (grid_row, grid_col) tuple or None if calculation fails
+        """
+        # Get cube bottom in 3D
+        cube_bottom_3d = self.get_cube_bottom_3d(origin_pos)
+        if cube_bottom_3d is None:
+            return None
+        
+        # Project to 2D pixel space
+        pixel_pos = self.project_cube_center_to_pixel(cube_bottom_3d, camera_matrix, dist_coeffs)
+        if pixel_pos is None:
+            return None
+        
+        # Get grid cell from pixel position
+        grid_cell = warp_manager.pixel_to_grid_cell(pixel_pos[0], pixel_pos[1])
+        return grid_cell
+    
+    def get_cube_bottom_grid_position(self, warp_manager, camera_matrix, dist_coeffs, origin_pos):
+        """
+        Get the continuous grid coordinates of the cube's bottom center.
+        
+        Args:
+            warp_manager: WarpPlane instance for grid mapping
+            camera_matrix: Camera intrinsic matrix
+            dist_coeffs: Distortion coefficients
+            origin_pos: 3D position of grid origin
+            
+        Returns:
+            (grid_row, grid_col) continuous coordinates or None if calculation fails
+        """
+        # Get cube bottom in 3D
+        cube_bottom_3d = self.get_cube_bottom_3d(origin_pos)
+        if cube_bottom_3d is None:
+            return None
+        
+        # Project to 2D pixel space
+        pixel_pos = self.project_cube_center_to_pixel(cube_bottom_3d, camera_matrix, dist_coeffs)
+        if pixel_pos is None:
+            return None
+        
+        # Get grid position from pixel
+        grid_pos = warp_manager.pixel_to_grid(pixel_pos[0], pixel_pos[1])
+        return grid_pos
+
 # Global flag for graceful exit
 _stop_requested = False
 
@@ -95,10 +339,17 @@ def _handle_sigint(signum, frame):
 signal.signal(signal.SIGINT, _handle_sigint)
 
 # --------------------------- Camera Calibration ---------------------------
-def capture_calibration_images(save_dir='calibration_images'):
+def capture_calibration_images(save_dir='aruco\\calibration_images'):
     """Capture checkerboard images using RealSense D415."""
     if not os.path.exists(save_dir):
         os.makedirs(save_dir)
+
+    existing_images = glob.glob(os.path.join(save_dir, '*.jpg'))
+    for image_path in existing_images:
+        os.remove(image_path)
+
+    if existing_images:
+        print(f"[INFO] Cleared {len(existing_images)} existing calibration image(s) from {save_dir}")
 
     try:
         pipeline = rs.pipeline()
@@ -142,7 +393,7 @@ def capture_calibration_images(save_dir='calibration_images'):
     print(f"[INFO] Total images captured: {img_count}")
 
 def calibrate_camera(checkerboard_size=CHECKERBOARD_SIZE, square_size=SQUARE_SIZE,
-                     image_dir='calibration_images', yaml_file='camera_params.yaml'):
+                     image_dir='aruco\\calibration_images', yaml_file='camera_params.yaml'):
     """Calibrate camera using checkerboard images."""
     criteria = (cv2.TERM_CRITERIA_EPS + cv2.TERM_CRITERIA_MAX_ITER, 30, 0.001)
     objp = np.zeros((checkerboard_size[0] * checkerboard_size[1], 3), np.float32)
@@ -206,7 +457,7 @@ def calibrate_camera(checkerboard_size=CHECKERBOARD_SIZE, square_size=SQUARE_SIZ
 
     return mtx, dist
 
-def test_undistortion(yaml_file='camera_params.yaml', image_dir='calibration_images'):
+def test_undistortion(yaml_file='camera_params.yaml', image_dir='aruco\\calibration_images'):
     """Test undistortion using saved calibration parameters."""
     try:
         with open(yaml_file, 'r') as f:
@@ -272,7 +523,6 @@ def estimate_pose_single_markers(corners, marker_size, camera_matrix, dist_coeff
 
 def detect_aruco_grid_and_cube(marker_size_m=MARKER_SIZE_M):
     """Detect ArUco grid and cube markers using RealSense D415."""
-    global show_yolo
     camera_matrix, dist_coeffs = load_camera_params()
     if camera_matrix is None:
         return
@@ -280,6 +530,7 @@ def detect_aruco_grid_and_cube(marker_size_m=MARKER_SIZE_M):
     aruco_dict = cv2.aruco.getPredefinedDictionary(ARUCO_DICT)
     detector = cv2.aruco.ArucoDetector(aruco_dict, cv2.aruco.DetectorParameters())
     tracker = MarkerTracker(max_path_length=100)
+    cube_tracker = CubeCenterTracker()
     warp_manager = WarpPlane()
     show_grid = True
     show_warped = False
@@ -326,6 +577,9 @@ def detect_aruco_grid_and_cube(marker_size_m=MARKER_SIZE_M):
                 origin_idx = np.where(ids.flatten() == 15)[0][0]
                 origin_pos = tvecs[origin_idx]
 
+            # Update cube center tracker with detected cube markers
+            cube_tracker.update_detected_markers(ids, tvecs)
+
             for i, marker_id in enumerate(ids.flatten()):
                 # Draw axes
                 cv2.drawFrameAxes(frame, camera_matrix, dist_coeffs,
@@ -338,20 +592,30 @@ def detect_aruco_grid_and_cube(marker_size_m=MARKER_SIZE_M):
                     corner_center = corners[i][0].mean(axis=0).astype(int)
                     cv2.putText(frame, text, tuple(corner_center), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0,255,0), 2)
                     distance = np.linalg.norm(rel_pos)
-                    print(f"Cube ID {marker_id}: distance from origin = {distance:.2f} m, x={rel_pos[0]:.2f} m, y={rel_pos[1]:.2f} m, z={rel_pos[2]:.2f} m")
 
-                    if warp_manager.is_calibrated:
-                        center_px = corners[i][0].mean(axis=0)
-                        grid_pos = warp_manager.pixel_to_grid(center_px[0], center_px[1])
-                        grid_cell = warp_manager.pixel_to_grid_cell(center_px[0], center_px[1])
-
-                        if grid_pos and grid_cell:
-                            grid_text = f"Cell: ({grid_cell[0]}, {grid_cell[1]})"
-                            cv2.putText(frame, grid_text, (corner_center[0], corner_center[1] + 20), cv2.
-                                        FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 255), 2)
-
-                            print(f"Grid cell ({grid_cell[0]}, {grid_cell[1]}), " f"continuous ({grid_pos[0]:.2f}, "
-                                  f"{grid_pos[1]:.2f})")
+            # Calculate and display cube bottom grid position
+            if warp_manager.is_calibrated and origin_idx is not None and len(cube_tracker.detected_markers) > 0:
+                # Get cube bottom grid cell
+                cube_grid_cell = cube_tracker.get_cube_bottom_grid_cell(warp_manager, camera_matrix, 
+                                                                   dist_coeffs, origin_pos)
+                cube_grid_pos = cube_tracker.get_cube_bottom_grid_position(warp_manager, camera_matrix,
+                                                                     dist_coeffs, origin_pos)
+                
+                if cube_grid_cell and cube_grid_pos:
+                    cube_grid_text = f"CUBE BOTTOM - Cell: ({cube_grid_cell[0]}, {cube_grid_cell[1]}) | " \
+                                    f"Pos: ({cube_grid_pos[0]:.2f}, {cube_grid_pos[1]:.2f})"
+                    cv2.putText(frame, cube_grid_text, (10, 50), cv2.FONT_HERSHEY_SIMPLEX, 
+                               0.7, (0, 0, 255), 2)
+                    
+                    # Also draw the projected cube bottom on the frame
+                    if cube_tracker.last_cube_center_pixel:
+                        px = cube_tracker.last_cube_center_pixel.astype(int)
+                        cv2.circle(frame, tuple(px), 8, (0, 0, 255), 2)  # Red circle for cube bottom
+                        cv2.putText(frame, "CUBE BOTTOM", (px[0]-40, px[1]-15), 
+                                   cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 2)
+                    
+                    print(f"CUBE BOTTOM - Grid cell ({cube_grid_cell[0]}, {cube_grid_cell[1]}), " 
+                          f"continuous ({cube_grid_pos[0]:.2f}, {cube_grid_pos[1]:.2f})")
 
             if show_grid and warp_manager.is_calibrated:
                 warp_manager.draw_grid_overlay(frame)
@@ -365,26 +629,6 @@ def detect_aruco_grid_and_cube(marker_size_m=MARKER_SIZE_M):
             pos = tracker.get_latest_position(mid)
             if pos is not None:
                 print(f"Cube {mid}: x={pos[0]:.3f} y={pos[1]:.3f} z={pos[2]:.3f} m")
-
-        if show_yolo:
-            results = yolo_model(frame, verbose=False)
-            boxes = results[0].boxes
-            for box in boxes:
-                x1, y1, x2, y2 = map(int, box.xyxy[0])
-                conf = float(box.conf[0])
-                cls = int(box.cls[0])
-                if conf < 0.5:
-                    continue
-                cv2.rectangle(frame, (x1, y1), (x2, y2), (0,255,0), 2)
-                label = f"{yolo_model.names[cls]}:{conf:.2f}"
-
-                if warp_manager.is_calibrated:
-                    cx, cy = (x1 + x2) // 2, (y1 + y2) // 2
-                    cell = warp_manager.pixel_to_grid_cell(cx, cy)
-                    if cell:
-                        label += f" @({cell[0]}, {cell[1]})"
-
-                cv2.putText(frame, label, (x1, y1-5), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0,0,0), 1)
 
         cv2.imshow("ArUco Cube Tracking", frame)
 
@@ -407,9 +651,6 @@ def detect_aruco_grid_and_cube(marker_size_m=MARKER_SIZE_M):
             cv2.imwrite(filename, frame)
             print(f"[INFO] Screenshot saved: {filename}")
             screenshot_count += 1
-        elif key == ord('y'):
-            show_yolo = not show_yolo
-            print(f"YOLO detection: {'ON' if show_yolo else 'OFF'}")
 
         elif key == ord('g'):
             show_grid = not show_grid
@@ -430,6 +671,106 @@ def detect_aruco_grid_and_cube(marker_size_m=MARKER_SIZE_M):
     warp_manager.destroy_warp_plane_instance()
     cv2.destroyAllWindows()
 
+import os
+import sys
+import time
+
+if os.name == "nt":
+    import msvcrt
+else:
+    import select
+    import termios
+    import tty
+
+
+def _get_key_nonblocking():
+    """
+    Return a single pressed key as lowercase text, or None if no key is ready.
+    Works in the terminal without OpenCV.
+    """
+    if os.name == "nt":
+        if msvcrt.kbhit():
+            ch = msvcrt.getch()
+
+            # Ignore special multi-byte keys like arrows/function keys
+            if ch in (b'\x00', b'\xe0'):
+                if msvcrt.kbhit():
+                    msvcrt.getch()
+                return None
+
+            try:
+                return ch.decode("utf-8", errors="ignore").lower()
+            except Exception:
+                return None
+        return None
+
+    fd = sys.stdin.fileno()
+    old_settings = termios.tcgetattr(fd)
+    try:
+        tty.setcbreak(fd)
+        ready, _, _ = select.select([sys.stdin], [], [], 0)
+        if ready:
+            ch = sys.stdin.read(1)
+            return ch.lower()
+        return None
+    finally:
+        termios.tcsetattr(fd, termios.TCSADRAIN, old_settings)
+
+
+def calibrate_franka_origin():
+    """Terminal-based manual control for calibrating Franka origin."""
+    print("[INFO] Franka manual control started.")
+    print("[INFO]   w = move up")
+    print("[INFO]   a = move left")
+    print("[INFO]   s = move down")
+    print("[INFO]   d = move right")
+    print("[INFO]   r = move out")
+    print("[INFO]   f = move in")
+    print("[INFO]   c = calibrate origin")
+    print("[INFO]   q = return to main menu")
+
+    movement_messages = {
+        'w': "[INFO] Moving Franka up...",
+        'a': "[INFO] Moving Franka left...",
+        's': "[INFO] Moving Franka down...",
+        'd': "[INFO] Moving Franka right...",
+        'r': "[INFO] Moving Franka out...",
+        'f': "[INFO] Moving Franka in...",
+    }
+
+    try:
+        while True:
+            key = _get_key_nonblocking()
+
+            if key is None:
+                time.sleep(0.01)
+                continue
+
+            if key in movement_messages:
+                print(movement_messages[key])
+
+            elif key == 'c':
+                print("[INFO] Calibrating Franka origin...")
+                break
+
+            elif key == 'q':
+                print("[INFO] Returning to main menu...")
+                break
+
+    except KeyboardInterrupt:
+        print("\n[INFO] Returning to main menu...")
+
+def franka_pick_and_place():
+    """Franka pick and place operation."""
+    print("[INFO] Input a grid cell to place the cube")
+    row = input("Enter cell row: ").strip().upper()
+    col = input("Enter cell column: ").strip().upper()
+    print(f"[INFO] Grid cell selection ({row}, {col})...")
+    choice = input("Confirm pick and place operation? (y/n): ").strip().lower()
+    if choice == 'y':
+        print(f"[INFO] Executing pick and place to cell ({row}, {col})...")
+    if choice == 'n':
+        print("[INFO] Operation cancelled.")
 
 # --------------------------- Main Menu ---------------------------
 def main():
@@ -439,8 +780,10 @@ def main():
         print("2. Calibrate camera")
         print("3. Test undistortion")
         print("4. Detect cube on ArUco grid (live feed)")
-        print("5. Exit")
-        choice = input("Enter choice (1-5): ")
+        print("5. Calibrate Franka origin")
+        print("6. Franka Pick and Place")
+        print("7. Exit")
+        choice = input("Enter choice (1-7): ")
 
         if choice == '1':
             capture_calibration_images()
@@ -451,10 +794,14 @@ def main():
         elif choice == '4':
             detect_aruco_grid_and_cube()
         elif choice == '5':
+            calibrate_franka_origin()
+        elif choice == '6':
+            franka_pick_and_place()
+        elif choice == '7':
             print("[INFO] Exiting...")
             break
         else:
-            print("[WARN] Invalid choice. Please enter 1-5.")
+            print("[WARN] Invalid choice. Please enter 1-7.")
 
 if __name__ == '__main__':
     main()
