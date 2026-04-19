@@ -41,12 +41,16 @@ def load_camera_params(yaml_file='camera_params.yaml'):
     pkg_share = get_package_share_directory('franka_pick_place')
     yaml_path = os.path.join(pkg_share, 'config', yaml_file)
 
-    with open(yaml_path, 'r') as f:
-        calib_data = yaml.safe_load(f)
+    try:
+        with open(yaml_path, 'r') as f:
+            calib_data = yaml.safe_load(f)
 
-    camera_matrix = np.array(calib_data['camera_matrix']).reshape((3, 3))
-    dist_coeffs = np.array(calib_data['distortion_coefficients']).reshape((-1, 1))
-    return camera_matrix, dist_coeffs
+        camera_matrix = np.array(calib_data['camera_matrix']).reshape((3, 3))
+        dist_coeffs = np.array(calib_data['distortion_coefficients']).reshape((-1, 1))
+        return camera_matrix, dist_coeffs
+    except FileNotFoundError:
+        print(f"[ERROR] {yaml_path} not found! Run calibration first.")
+        return None, None
 
 
 def estimate_pose_single_markers(corners, marker_size, camera_matrix, dist_coeffs):
