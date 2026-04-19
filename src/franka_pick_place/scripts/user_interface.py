@@ -27,6 +27,9 @@ from geometry_msgs.msg import PoseStamped
 # Add package paths
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 PKG_DIR = os.path.dirname(SCRIPT_DIR)
+CONFIG_DIR = os.path.join(PKG_DIR, 'config')
+CALIBRATION_DIR = os.path.join(CONFIG_DIR, 'calibration_images')
+CAMERA_PARAMS_FILE = os.path.join(CONFIG_DIR, 'camera_params.yaml')
 sys.path.append(PKG_DIR)
 
 from cv_transform.warp_plane import WarpPlane
@@ -66,15 +69,15 @@ def load_camera_params(yaml_file='camera_params.yaml'):
         return None, None
 
 
-def capture_calibration_images(save_dir='aruco/calibration_images'):
+def capture_calibration_images(save_dir=None):
     """Capture checkerboard images using RealSense D415."""
-    pkg_share = get_package_share_directory('franka_pick_place')
-    save_path = os.path.join(pkg_share, save_dir)
+    if save_dir is None:
+        save_dir = CALIBRATION_DIR
     
-    if not os.path.exists(save_path):
-        os.makedirs(save_path)
+    if not os.path.exists(save_dir):
+        os.makedirs(save_dir)
 
-    existing_images = glob.glob(os.path.join(save_path, '*.jpg'))
+    existing_images = glob.glob(os.path.join(save_dir, '*.jpg'))
     for image_path in existing_images:
         os.remove(image_path)
 
@@ -117,7 +120,7 @@ def capture_calibration_images(save_dir='aruco/calibration_images'):
         if key == ord('q'):
             break
         elif key == ord(' '):
-            filename = os.path.join(save_path, f'calib_{img_count:02d}.jpg')
+            filename = os.path.join(save_dir, f'calib_{img_count:02d}.jpg')
             cv2.imwrite(filename, frame)
             print(f"[INFO] Saved calibration image {img_count}")
             img_count += 1
@@ -125,13 +128,13 @@ def capture_calibration_images(save_dir='aruco/calibration_images'):
     pipeline.stop()
     cv2.destroyAllWindows()
     print(f"[INFO] Total images captured: {img_count}")
+    print(f"[INFO] Images saved to: {save_dir}")
 
 
 def calibrate_camera(checkerboard_size=CHECKERBOARD_SIZE, square_size=SQUARE_SIZE):
     """Calibrate camera using checkerboard images."""
-    pkg_share = get_package_share_directory('franka_pick_place')
-    image_dir = os.path.join(pkg_share, 'config', 'aruco/calibration_images')
-    yaml_file = os.path.join(pkg_share, 'config', 'camera_params.yaml')
+    image_dir = CALIBRATION_DIR
+    yaml_file = CAMERA_PARAMS_FILE
     
     criteria = (cv2.TERM_CRITERIA_EPS + cv2.TERM_CRITERIA_MAX_ITER, 30, 0.001)
     objp = np.zeros((checkerboard_size[0] * checkerboard_size[1], 3), np.float32)
@@ -198,9 +201,8 @@ def calibrate_camera(checkerboard_size=CHECKERBOARD_SIZE, square_size=SQUARE_SIZ
 
 def test_undistortion():
     """Test undistortion using saved calibration parameters."""
-    pkg_share = get_package_share_directory('franka_pick_place')
-    yaml_file = os.path.join(pkg_share, 'config', 'camera_params.yaml')
-    image_dir = os.path.join(pkg_share, 'config', 'aruco/calibration_images')
+    yaml_file = CAMERA_PARAMS_FILE
+    image_dir = CALIBRATION_DIR
     
     try:
         with open(yaml_file, 'r') as f:

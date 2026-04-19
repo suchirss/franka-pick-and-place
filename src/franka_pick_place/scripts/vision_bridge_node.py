@@ -17,6 +17,8 @@ from ament_index_python.packages import get_package_share_directory
 
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 PKG_DIR = os.path.dirname(SCRIPT_DIR)
+CONFIG_DIR = os.path.join(PKG_DIR, 'config')
+CAMERA_PARAMS_FILE = os.path.join(CONFIG_DIR, 'camera_params.yaml')
 sys.path.append(PKG_DIR)
 
 from cv_transform.warp_plane import WarpPlane
@@ -38,8 +40,7 @@ signal.signal(signal.SIGINT, _handle_sigint)
 
 
 def load_camera_params(yaml_file='camera_params.yaml'):
-    pkg_share = get_package_share_directory('franka_pick_place')
-    yaml_path = os.path.join(pkg_share, 'config', yaml_file)
+    yaml_path = CAMERA_PARAMS_FILE
 
     try:
         with open(yaml_path, 'r') as f:
