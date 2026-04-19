@@ -61,7 +61,7 @@ class FullPickPlaceNode(Node):
         rclpy.spin_until_future_complete(self, future)
         return True
 
-def vision_callback(self, msg):
+    def vision_callback(self, msg):
         
         if self.target_received:
             return

@@ -28,7 +28,6 @@ sys.path.append(PKG_DIR)
 
 from cv_transform.warp_plane import WarpPlane
 
-# ===== CONSTANTS =====
 ARUCO_DICT = cv2.aruco.DICT_4X4_250
 GRID_MARKER_ID_ORIGIN = 15
 CUBE_MARKER_IDS = list(range(70, 76))
@@ -48,8 +47,6 @@ def _handle_sigint(signum, frame):
 signal.signal(signal.SIGINT, _handle_sigint)
 
 
-# ===== CONFIGURATION =====
-
 def get_config_paths():
     """Get standard config paths based on script location."""
     config_dir = os.path.join(PKG_DIR, 'config')
@@ -65,8 +62,6 @@ def get_config_paths():
     }
 
 
-# ===== CAMERA FUNCTIONS =====
-
 def load_camera_params(yaml_file='camera_params.yaml'):
     """Load camera matrix and distortion coefficients from YAML file."""
     paths = get_config_paths()
@@ -75,15 +70,13 @@ def load_camera_params(yaml_file='camera_params.yaml'):
     try:
         with open(yaml_path, 'r') as f:
             calib_data = yaml.safe_load(f)
-        camera_matrix = np.array(calib_data['camera_matrix']).reshape((3, 3))
-        dist_coeffs = np.array(calib_data['distortion_coefficients']).reshape((-1, 1))
+        camera_matrix = np.array(calib_data['camera_matrix'], dtype=np.float64)
+        dist_coeffs = np.array(calib_data['distortion_coefficients'], dtype=np.float64)
         return camera_matrix, dist_coeffs
     except FileNotFoundError:
         print(f"[ERROR] {yaml_path} not found! Run calibration first.")
         return None, None
 
-
-# ===== MARKER POSE ESTIMATION =====
 
 def estimate_pose_single_markers(corners, marker_size, camera_matrix, dist_coeffs):
     """
@@ -121,8 +114,6 @@ def estimate_pose_single_markers(corners, marker_size, camera_matrix, dist_coeff
 
     return np.array(rvecs), np.array(tvecs), marker_points
 
-
-# ===== MARKER TRACKING =====
 
 class MarkerTracker:
     """Track ArUco marker 3D positions and compute velocities."""
@@ -181,8 +172,6 @@ class MarkerTracker:
             return self.paths[marker_id][-1]
         return None
 
-
-# ===== CUBE CENTER TRACKING =====
 
 class CubeCenterTracker:
     """
@@ -269,10 +258,9 @@ class CubeCenterTracker:
         if cube_center_3d is None:
             return None
         
-        # Ensure proper shape for cv2.projectPoints
-        points_3d = np.array([cube_center_3d.flatten()], dtype=np.float32)
-        rvec = np.zeros((3, 1), dtype=np.float32)
-        tvec = np.zeros((3, 1), dtype=np.float32)
+        points_3d = np.array([cube_center_3d.flatten()], dtype=np.float64)
+        rvec = np.array([0.0, 0.0, 0.0], dtype=np.float64)
+        tvec = np.array([0.0, 0.0, 0.0], dtype=np.float64)
         
         try:
             projected_points, _ = cv2.projectPoints(
