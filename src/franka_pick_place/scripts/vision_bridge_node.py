@@ -1,32 +1,41 @@
 #!/usr/bin/env python3
 
+"""
+Vision Bridge Node - Central vision and camera processing module
+
+Contains all ArUco marker detection, cube tracking, and camera calibration functionality.
+Used by both the ROS2 autonomous node (VisionBridgeNode) and the interactive menu (user_interface).
+"""
+
 import time
 import signal
 import cv2
 import numpy as np
 import pyrealsense2 as rs
 import yaml
+import os
+import sys
+import glob
+from collections import deque
 
 import rclpy
 from rclpy.node import Node
 from geometry_msgs.msg import PoseStamped
 
-import os
-import sys
-from ament_index_python.packages import get_package_share_directory
-
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 PKG_DIR = os.path.dirname(SCRIPT_DIR)
-CONFIG_DIR = os.path.join(PKG_DIR, 'config')
-CAMERA_PARAMS_FILE = os.path.join(CONFIG_DIR, 'camera_params.yaml')
 sys.path.append(PKG_DIR)
 
 from cv_transform.warp_plane import WarpPlane
 
+# ===== CONSTANTS =====
 ARUCO_DICT = cv2.aruco.DICT_4X4_250
 GRID_MARKER_ID_ORIGIN = 15
 CUBE_MARKER_IDS = list(range(70, 76))
+GRID_MARKER_IDS = list(range(15, 45))
 MARKER_SIZE_M = 0.0381  # 1.5 inch in meters
+CHECKERBOARD_SIZE = (5, 7)
+SQUARE_SIZE = 0.0381
 
 _stop_requested = False
 
@@ -39,13 +48,33 @@ def _handle_sigint(signum, frame):
 signal.signal(signal.SIGINT, _handle_sigint)
 
 
-def load_camera_params(yaml_file='camera_params.yaml'):
-    yaml_path = CAMERA_PARAMS_FILE
+# ===== CONFIGURATION =====
 
+def get_config_paths():
+    """Get standard config paths based on script location."""
+    config_dir = os.path.join(PKG_DIR, 'config')
+    calibration_dir = os.path.join(config_dir, 'calibration_images')
+    camera_params_file = os.path.join(config_dir, 'camera_params.yaml')
+    
+    return {
+        'script_dir': SCRIPT_DIR,
+        'pkg_dir': PKG_DIR,
+        'config_dir': config_dir,
+        'calibration_dir': calibration_dir,
+        'camera_params_file': camera_params_file,
+    }
+
+
+# ===== CAMERA FUNCTIONS =====
+
+def load_camera_params(yaml_file='camera_params.yaml'):
+    """Load camera matrix and distortion coefficients from YAML file."""
+    paths = get_config_paths()
+    yaml_path = paths['camera_params_file']
+    
     try:
         with open(yaml_path, 'r') as f:
             calib_data = yaml.safe_load(f)
-
         camera_matrix = np.array(calib_data['camera_matrix']).reshape((3, 3))
         dist_coeffs = np.array(calib_data['distortion_coefficients']).reshape((-1, 1))
         return camera_matrix, dist_coeffs
@@ -54,7 +83,22 @@ def load_camera_params(yaml_file='camera_params.yaml'):
         return None, None
 
 
+# ===== MARKER POSE ESTIMATION =====
+
 def estimate_pose_single_markers(corners, marker_size, camera_matrix, dist_coeffs):
+    """
+    Estimate pose for single markers using solvePnP.
+    Uses older OpenCV API for compatibility with older ROS2 distributions.
+    
+    Args:
+        corners: List of marker corner arrays
+        marker_size: Physical size of marker in meters
+        camera_matrix: Camera intrinsic matrix (3x3)
+        dist_coeffs: Distortion coefficients
+        
+    Returns:
+        Tuple of (rvecs array, tvecs array, marker_points)
+    """
     marker_points = np.array([
         [-marker_size / 2,  marker_size / 2, 0],
         [ marker_size / 2,  marker_size / 2, 0],
@@ -75,10 +119,71 @@ def estimate_pose_single_markers(corners, marker_size, camera_matrix, dist_coeff
             rvecs.append(rvec)
             tvecs.append(tvec)
 
-    return np.array(rvecs), np.array(tvecs)
+    return np.array(rvecs), np.array(tvecs), marker_points
 
 
-# ------------------- CubeCenterTracker Class -------------------
+# ===== MARKER TRACKING =====
+
+class MarkerTracker:
+    """Track ArUco marker 3D positions and compute velocities."""
+
+    def __init__(self, max_path_length=100):
+        """
+        Initialize marker tracker.
+        
+        Args:
+            max_path_length: Maximum number of position samples to store per marker
+        """
+        self.paths = {}           # marker_id -> deque of 3D positions
+        self.max_path_length = max_path_length
+        self.velocities = {}      # marker_id -> (vx, vy, vz)
+        self.last_positions = {}  # marker_id -> last 3D position
+        self.last_time = {}       # marker_id -> last timestamp
+
+    def update_position(self, marker_id, pos_3d, timestamp):
+        """
+        Update marker 3D position and compute instantaneous velocity.
+        
+        Args:
+            marker_id: ID of the marker
+            pos_3d: 3D position array (x, y, z)
+            timestamp: Current timestamp for velocity computation
+        """
+        if marker_id not in self.paths:
+            self.paths[marker_id] = deque(maxlen=self.max_path_length)
+            self.velocities[marker_id] = (0.0, 0.0, 0.0)
+            self.last_positions[marker_id] = pos_3d
+            self.last_time[marker_id] = timestamp
+
+        self.paths[marker_id].append(pos_3d)
+
+        last_pos = self.last_positions[marker_id]
+        dt = timestamp - self.last_time[marker_id]
+
+        if dt > 0:
+            vx, vy, vz = [(pos_3d[i] - last_pos[i]) / dt for i in range(3)]
+            self.velocities[marker_id] = (vx, vy, vz)
+
+        self.last_positions[marker_id] = pos_3d
+        self.last_time[marker_id] = timestamp
+
+    def get_latest_position(self, marker_id):
+        """
+        Return the most recent 3D position for a marker.
+        
+        Args:
+            marker_id: ID of the marker
+            
+        Returns:
+            3D position array or None if no data
+        """
+        if marker_id in self.paths and len(self.paths[marker_id]) > 0:
+            return self.paths[marker_id][-1]
+        return None
+
+
+# ===== CUBE CENTER TRACKING =====
+
 class CubeCenterTracker:
     """
     Track the 3D center of a cube using detected ArUco markers.
@@ -87,7 +192,7 @@ class CubeCenterTracker:
     The marker offsets assume a 1.5-inch cube with markers on top and sides.
     """
     
-    # Marker ID to assumed position offset from cube center (in meters, assuming markers at ±0.75 inches = ±0.01905m)
+    # Marker ID to offset from cube center (in meters)
     # Adjust these based on your actual cube marker layout
     MARKER_OFFSETS = {
         70: np.array([ 0.01905,  0.01905,  0.01905]),  # Top-Right-Front
@@ -131,7 +236,7 @@ class CubeCenterTracker:
         if not self.detected_markers:
             return None
         
-        # Simple approach: average the back-calculated centers from each marker
+        # Average the back-calculated centers from each marker for robustness
         estimated_centers = []
         for marker_id, tvec in self.detected_markers.items():
             offset = self.MARKER_OFFSETS[marker_id]
@@ -140,7 +245,6 @@ class CubeCenterTracker:
             estimated_centers.append(estimated_center)
         
         if estimated_centers:
-            # Average all estimated centers to reduce error
             cube_center = np.mean(estimated_centers, axis=0)
             self.last_cube_center_3d = cube_center
             
@@ -183,10 +287,10 @@ class CubeCenterTracker:
     
     def get_cube_bottom_3d(self, origin_pos):
         """
-        Get the 3D position of the cube's bottom center (vertical center offset downward by 0.75 inches).
+        Get the 3D position of the cube's bottom center.
         
-        In world coordinates, "downward" means negative Z direction.
-        Offset is 0.75 inches (0.01905 m).
+        Cube bottom is defined as the cube center offset downward by 0.75 inches
+        (half the cube height) in the negative Z direction.
         
         Args:
             origin_pos: 3D position of grid origin
@@ -194,15 +298,14 @@ class CubeCenterTracker:
         Returns:
             3D position of cube bottom or None if no markers detected
         """
-        # Get cube center
         cube_center_3d = self.calculate_cube_center_3d(origin_pos)
         if cube_center_3d is None:
             return None
         
-        # Offset downward by 0.75 inches (half cube height) in negative Z direction
-        CUBE_HEIGHT_OFFSET = 0.01905  # 0.75 inches in meters
+        # Offset downward by 0.75 inches (0.01905 meters) in negative Z
+        CUBE_HEIGHT_OFFSET = 0.01905
         cube_bottom_3d = cube_center_3d.copy()
-        cube_bottom_3d[2] -= CUBE_HEIGHT_OFFSET  # Move down (negative Z)
+        cube_bottom_3d[2] -= CUBE_HEIGHT_OFFSET
         
         return cube_bottom_3d
     
@@ -219,17 +322,14 @@ class CubeCenterTracker:
         Returns:
             (grid_row, grid_col) tuple or None if calculation fails
         """
-        # Get cube bottom in 3D
         cube_bottom_3d = self.get_cube_bottom_3d(origin_pos)
         if cube_bottom_3d is None:
             return None
         
-        # Project to 2D pixel space
         pixel_pos = self.project_cube_center_to_pixel(cube_bottom_3d, camera_matrix, dist_coeffs)
         if pixel_pos is None:
             return None
         
-        # Get grid cell from pixel position
         grid_cell = warp_manager.pixel_to_grid_cell(pixel_pos[0], pixel_pos[1])
         return grid_cell
     
@@ -244,21 +344,294 @@ class CubeCenterTracker:
             origin_pos: 3D position of grid origin
             
         Returns:
-            (grid_row, grid_col) continuous coordinates or None if calculation fails
+            (grid_x, grid_y) continuous coordinates or None if calculation fails
         """
-        # Get cube bottom in 3D
         cube_bottom_3d = self.get_cube_bottom_3d(origin_pos)
         if cube_bottom_3d is None:
             return None
         
-        # Project to 2D pixel space
         pixel_pos = self.project_cube_center_to_pixel(cube_bottom_3d, camera_matrix, dist_coeffs)
         if pixel_pos is None:
             return None
         
-        # Get grid position from pixel
         grid_pos = warp_manager.pixel_to_grid(pixel_pos[0], pixel_pos[1])
         return grid_pos
+
+
+# ===== CALIBRATION FUNCTIONS =====
+
+def capture_calibration_images(save_dir=None):
+    """Capture checkerboard images using RealSense D415."""
+    if save_dir is None:
+        paths = get_config_paths()
+        save_dir = paths['calibration_dir']
+    
+    if not os.path.exists(save_dir):
+        os.makedirs(save_dir)
+
+    existing_images = glob.glob(os.path.join(save_dir, '*.jpg'))
+    for image_path in existing_images:
+        os.remove(image_path)
+
+    if existing_images:
+        print(f"[INFO] Cleared {len(existing_images)} existing calibration image(s)")
+
+    try:
+        pipeline = rs.pipeline()
+        config = rs.config()
+        config.enable_stream(rs.stream.color, 640, 480, rs.format.bgr8, 30)
+        pipeline.start(config)
+    except Exception as e:
+        print(f"[ERROR] Could not start RealSense camera: {e}")
+        return
+
+    img_count = 0
+    print("[INFO] Capture calibration images")
+    print("[INFO] Press 'SPACE' to capture, 'Q' to finish")
+
+    while True:
+        if _stop_requested:
+            break
+        
+        frames = pipeline.wait_for_frames()
+        color_frame = frames.get_color_frame()
+        if not color_frame:
+            continue
+        
+        frame = np.asanyarray(color_frame.get_data())
+        display_frame = frame.copy()
+
+        cv2.putText(display_frame, f'Images captured: {img_count}', (10, 30),
+                    cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
+        cv2.putText(display_frame, 'SPACE: Capture | Q: Done', (10, 70),
+                    cv2.FONT_HERSHEY_SIMPLEX, 0.7, (255, 255, 255), 2)
+
+        cv2.imshow("Capture Calibration Images", display_frame)
+        key = cv2.waitKey(1) & 0xFF
+        
+        if key == ord('q'):
+            break
+        elif key == ord(' '):
+            filename = os.path.join(save_dir, f'calib_{img_count:02d}.jpg')
+            cv2.imwrite(filename, frame)
+            print(f"[INFO] Saved calibration image {img_count}")
+            img_count += 1
+
+    pipeline.stop()
+    cv2.destroyAllWindows()
+    print(f"[INFO] Total images captured: {img_count}")
+    print(f"[INFO] Images saved to: {save_dir}")
+
+
+def calibrate_camera(checkerboard_size=CHECKERBOARD_SIZE, square_size=SQUARE_SIZE):
+    """Calibrate camera using checkerboard images."""
+    paths = get_config_paths()
+    image_dir = paths['calibration_dir']
+    yaml_file = paths['camera_params_file']
+    
+    criteria = (cv2.TERM_CRITERIA_EPS + cv2.TERM_CRITERIA_MAX_ITER, 30, 0.001)
+    objp = np.zeros((checkerboard_size[0] * checkerboard_size[1], 3), np.float32)
+    objp[:, :2] = np.mgrid[0:checkerboard_size[0], 0:checkerboard_size[1]].T.reshape(-1, 2) * square_size
+
+    objpoints = []
+    imgpoints = []
+
+    images = glob.glob(os.path.join(image_dir, '*.jpg'))
+    if len(images) == 0:
+        print(f"[ERROR] No calibration images found in {image_dir}")
+        return None, None
+
+    print(f"[INFO] Processing {len(images)} images for calibration...")
+
+    for fname in images:
+        img = cv2.imread(fname)
+        gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+
+        ret, corners = cv2.findChessboardCorners(gray, checkerboard_size, None)
+
+        if ret:
+            objpoints.append(objp)
+            corners2 = cv2.cornerSubPix(gray, corners, (11, 11), (-1, -1), criteria)
+            imgpoints.append(corners2)
+
+    if len(objpoints) == 0:
+        print("[ERROR] Could not find checkerboard corners in any image")
+        return None, None
+
+    print(f"[INFO] Found checkerboard in {len(objpoints)} images")
+
+    ret, camera_matrix, dist_coeffs, rvecs, tvecs = cv2.calibrateCamera(
+        objpoints, imgpoints, gray.shape[::-1], None, None
+    )
+
+    if not ret:
+        print("[ERROR] Camera calibration failed")
+        return None, None
+
+    calib_data = {
+        'camera_matrix': camera_matrix.tolist(),
+        'distortion_coefficients': dist_coeffs.flatten().tolist(),
+    }
+
+    try:
+        os.makedirs(os.path.dirname(yaml_file), exist_ok=True)
+        with open(yaml_file, 'w') as f:
+            yaml.dump(calib_data, f)
+        print(f"[INFO] Camera calibration saved to {yaml_file}")
+        return camera_matrix, dist_coeffs
+    except Exception as e:
+        print(f"[ERROR] Could not save calibration: {e}")
+        return None, None
+
+
+def test_undistortion():
+    """Test camera calibration by displaying undistorted frames."""
+    camera_matrix, dist_coeffs = load_camera_params()
+    if camera_matrix is None:
+        print("[ERROR] Camera calibration not found. Run calibration first.")
+        return
+
+    try:
+        pipeline = rs.pipeline()
+        config = rs.config()
+        config.enable_stream(rs.stream.color, 640, 480, rs.format.bgr8, 30)
+        pipeline.start(config)
+    except Exception as e:
+        print(f"[ERROR] Could not start RealSense camera: {e}")
+        return
+
+    print("[INFO] Displaying calibrated and undistorted frames")
+    print("[INFO] Press 'Q' to exit")
+
+    while True:
+        if _stop_requested:
+            break
+
+        frames = pipeline.wait_for_frames()
+        color_frame = frames.get_color_frame()
+        if not color_frame:
+            continue
+
+        frame = np.asanyarray(color_frame.get_data())
+        undistorted = cv2.undistort(frame, camera_matrix, dist_coeffs)
+
+        cv2.imshow("Original", frame)
+        cv2.imshow("Undistorted", undistorted)
+
+        key = cv2.waitKey(1) & 0xFF
+        if key == ord('q'):
+            break
+
+    pipeline.stop()
+    cv2.destroyAllWindows()
+    print("[INFO] Undistortion test complete")
+
+
+def detect_aruco_grid_and_cube(marker_size_m=MARKER_SIZE_M):
+    """Detect ArUco grid and cube markers using RealSense D415."""
+    camera_matrix, dist_coeffs = load_camera_params()
+    if camera_matrix is None:
+        return
+
+    aruco_dict = cv2.aruco.Dictionary_get(ARUCO_DICT)
+    detector_params = cv2.aruco.DetectorParameters()
+    tracker = MarkerTracker(max_path_length=100)
+    cube_tracker = CubeCenterTracker()
+    warp_manager = WarpPlane()
+    show_grid = True
+
+    try:
+        pipeline = rs.pipeline()
+        config = rs.config()
+        config.enable_stream(rs.stream.color, 640, 480, rs.format.bgr8, 30)
+        pipeline.start(config)
+    except Exception as e:
+        print(f"[ERROR] Could not start RealSense camera: {e}")
+        warp_manager.destroy_warp_plane_instance()
+        return
+
+    print("[INFO] Press 'Q' to quit detection, 'G' to toggle grid")
+    print("[INFO] Detecting ArUco markers and cube position...")
+
+    while True:
+        if _stop_requested:
+            break
+        frames = pipeline.wait_for_frames()
+        color_frame = frames.get_color_frame()
+        if not color_frame:
+            continue
+        frame = np.asanyarray(color_frame.get_data())
+        gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+
+        corners, ids, _ = cv2.aruco.detectMarkers(gray, aruco_dict, parameters=detector_params)
+        if ids is not None and len(ids) > 0:
+            cv2.aruco.drawDetectedMarkers(frame, corners, ids)
+            rvecs, tvecs, _ = estimate_pose_single_markers(corners, marker_size_m,
+                                                           camera_matrix, dist_coeffs)
+
+            if not warp_manager.is_calibrated:
+                if warp_manager.compute_homography(corners, ids):
+                    print("[INFO] Grid homography completed successfully")
+                else:
+                    print("[WARN] Not enough grid markers visible for homography")
+
+            # Find grid origin marker (ID 15)
+            ids_flat = ids.flatten()
+            origin_idx = None
+            if GRID_MARKER_ID_ORIGIN in ids_flat:
+                origin_idx = np.where(ids_flat == GRID_MARKER_ID_ORIGIN)[0][0]
+                origin_pos = tvecs[origin_idx]
+
+                # Update cube tracker
+                cube_tracker.update_detected_markers(ids, tvecs)
+
+                for i, marker_id in enumerate(ids_flat):
+                    cv2.drawFrameAxes(frame, camera_matrix, dist_coeffs,
+                                      rvecs[i], tvecs[i], marker_size_m*0.5)
+
+                # Display cube bottom grid position
+                if warp_manager.is_calibrated and len(cube_tracker.detected_markers) > 0:
+                    cube_grid_cell = cube_tracker.get_cube_bottom_grid_cell(warp_manager, camera_matrix, 
+                                                                       dist_coeffs, origin_pos)
+                    cube_grid_pos = cube_tracker.get_cube_bottom_grid_position(warp_manager, camera_matrix,
+                                                                         dist_coeffs, origin_pos)
+                    
+                    if cube_grid_cell and cube_grid_pos:
+                        cube_grid_text = f"CUBE BOTTOM - Cell: ({cube_grid_cell[0]}, {cube_grid_cell[1]}) | " \
+                                        f"Pos: ({cube_grid_pos[0]:.2f}, {cube_grid_pos[1]:.2f})"
+                        cv2.putText(frame, cube_grid_text, (10, 50), cv2.FONT_HERSHEY_SIMPLEX, 
+                                   0.7, (0, 0, 255), 2)
+                        
+                        if cube_tracker.last_cube_center_pixel is not None:
+                            px = cube_tracker.last_cube_center_pixel.astype(int)
+                            cv2.circle(frame, tuple(px), 8, (0, 0, 255), 2)
+                            cv2.putText(frame, "CUBE BOTTOM", (px[0]-40, px[1]-15), 
+                                       cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 2)
+                        
+                        print(f"CUBE BOTTOM - Grid cell ({cube_grid_cell[0]}, {cube_grid_cell[1]}), " 
+                              f"continuous ({cube_grid_pos[0]:.2f}, {cube_grid_pos[1]:.2f})")
+
+            if show_grid and warp_manager.is_calibrated:
+                warp_manager.draw_grid_overlay(frame)
+
+        else:
+            cv2.putText(frame, 'No markers detected', (10, 30),
+                        cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0,0,255), 2)
+
+        cv2.imshow("ArUco Cube Detection", frame)
+
+        key = cv2.waitKey(1) & 0xFF
+        if key == ord('q'):
+            break
+        elif key == ord('g'):
+            show_grid = not show_grid
+            print(f"Grid overlay: {'ON' if show_grid else 'OFF'}")
+
+    pipeline.stop()
+    warp_manager.destroy_warp_plane_instance()
+    cv2.destroyAllWindows()
+    print("[INFO] Detection complete")
+
 
 
 class VisionBridgeNode(Node):
@@ -269,8 +642,8 @@ class VisionBridgeNode(Node):
 
         self.camera_matrix, self.dist_coeffs = load_camera_params('camera_params.yaml')
 
-        self.aruco_dict = cv2.aruco.getPredefinedDictionary(ARUCO_DICT)
-        self.detector_params = cv2.aruco.DetectorParameters_create()
+        self.aruco_dict = cv2.aruco.Dictionary_get(ARUCO_DICT)
+        self.detector_params = cv2.aruco.DetectorParameters()
 
         self.warp_manager = WarpPlane()
         self.cube_tracker = CubeCenterTracker()
