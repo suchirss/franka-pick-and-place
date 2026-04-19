@@ -534,7 +534,7 @@ def detect_aruco_grid_and_cube(marker_size_m=MARKER_SIZE_M):
         return
 
     aruco_dict = cv2.aruco.Dictionary_get(ARUCO_DICT)
-    detector_params = cv2.aruco.DetectorParameters()
+    detector_params = cv2.aruco.DetectorParameters_create()
     tracker = MarkerTracker(max_path_length=100)
     cube_tracker = CubeCenterTracker()
     warp_manager = WarpPlane()
@@ -643,7 +643,7 @@ class VisionBridgeNode(Node):
         self.camera_matrix, self.dist_coeffs = load_camera_params('camera_params.yaml')
 
         self.aruco_dict = cv2.aruco.Dictionary_get(ARUCO_DICT)
-        self.detector_params = cv2.aruco.DetectorParameters()
+        self.detector_params = cv2.aruco.DetectorParameters_create()
 
         self.warp_manager = WarpPlane()
         self.cube_tracker = CubeCenterTracker()
