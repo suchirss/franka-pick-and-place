@@ -271,8 +271,8 @@ class CubeCenterTracker:
         
         # Ensure proper shape for cv2.projectPoints
         points_3d = np.array([cube_center_3d.flatten()], dtype=np.float32)
-        rvec = np.array([0.0, 0.0, 0.0], dtype=np.float32)
-        tvec = np.array([0.0, 0.0, 0.0], dtype=np.float32)
+        rvec = np.zeros((3, 1), dtype=np.float32)
+        tvec = np.zeros((3, 1), dtype=np.float32)
         
         try:
             projected_points, _ = cv2.projectPoints(
