@@ -20,7 +20,6 @@ sys.path.append(PKG_DIR)
 import rclpy
 from rclpy.node import Node
 
-# Import all vision functions and classes from vision_bridge_node
 from vision_bridge_node import (
     capture_calibration_images,
     calibrate_camera,
@@ -29,16 +28,41 @@ from vision_bridge_node import (
     get_config_paths,
 )
 
+from pick_place_node import FullPickPlaceNode
+
 def franka_pick_and_place():
-    """Franka pick and place operation."""
-    print("\n[INFO] Franka Pick and Place Mode")
-    print("[INFO] Please position the cube on the grid and ensure the camera can see the markers.")
-    print("[INFO] The system will automatically detect the cube and execute the pick and place operation.")
-    
-    input("[INFO] Press Enter to start detection and proceed with pick and place...")
-    print("[INFO] Starting cube detection and pick and place sequence...")
-    print("[INFO] (This is handled by vision_bridge_node and pick_place_node)")
-    print("[INFO] Monitor the ROS2 output for progress updates")
+    try:
+        print("[INFO] Enter the target grid cell coordinates.")
+        print("[INFO] Grid is 6 rows x 5 columns, origin at top-left (1,1)")
+        
+        try:
+            row = int(input("[INPUT] Target row (1-6): ").strip())
+            col = int(input("[INPUT] Target column (1-5): ").strip())
+            
+            if not (1 <= row <= 6) or not (1 <= col <= 5):
+                print("[ERROR] Invalid grid coordinates. Rows: 1-6, Columns: 1-5")
+                return
+        except ValueError:
+            print("[ERROR] Please enter valid integers for row and column.")
+            return
+        
+        print(f"[INFO] Target grid cell: Row {row}, Column {col}")
+        print("[INFO] Initializing pick-place node...")
+        
+        pick_place_node = FullPickPlaceNode()
+        success = pick_place_node.execute_pick_place(row, col)
+        
+        if success:
+            print("[SUCCESS] Pick-place sequence complete!")
+        else:
+            print("[ERROR] Pick-place sequence failed!")
+            
+    except KeyboardInterrupt:
+        print("\n[INFO] Pick-place cancelled by user.")
+    except Exception as e:
+        print(f"[ERROR] Pick-place error: {e}")
+        import traceback
+        traceback.print_exc()
 
 
 class UserInterfaceNode(Node):
