@@ -102,6 +102,7 @@ class FullPickPlaceNode(Node):
         safe_z_low = 0.02        # Height at which grippers close (2cm) - can increase to 0.10 for first run to avoid hitting table
         gripper_open = 0.08      # 8cm wide
         gripper_closed = 0.0381  # 1.5 inches (size of cube) - will close at either this or max effort - see helper action above
+        downward_orientation = [1.0, 0.0, 0.0, 0.0] # Default Gripper straight down orientation (x, y, z, w)
 
         # Ensure gripper is open before starting
         self.set_gripper(gripper_open)
@@ -109,40 +110,40 @@ class FullPickPlaceNode(Node):
         # PICK UP PHASE=================================
 
         # 1. Setup Pre-Grasp Pose
-        pre_grasp_pose = PoseStamped()
-        pre_grasp_pose.header.frame_id = "fr3_link0"
-        pre_grasp_pose.pose.position.x = self.robot_target_x
-        pre_grasp_pose.pose.position.y = self.robot_target_y
-        pre_grasp_pose.pose.position.z = safe_z_high
-
-        # Gripper straight down
-        pre_grasp_pose.pose.orientation.x = 1.0
-        pre_grasp_pose.pose.orientation.y = 0.0
-        pre_grasp_pose.pose.orientation.z = 0.0
-        pre_grasp_pose.pose.orientation.w = 0.0
-
         self.get_logger().info("STEP 1: Moving to Pre-Grasp...")
-        self.moveit2.move_to_pose(pre_grasp_pose) # if not centered above cube, press e-stop here!
-        if not self.moveit2.wait_until_executed(): return False
-
+        self.moveit2.move_to_pose(
+            position=[self.robot_target_x, self.robot_target_y, safe_z_high],
+            quat_xyzw=downward_orientation,
+            frame_id="fr3_link0"
+        ) # if not centered above cube, press e-stop here!
+        if not self.moveit2.wait_until_executed(): 
+            self.get_logger().error("Failed to reach Pre-Grasp. Aborting sequence.")
+            return False
+        
         # 2. Descend to target
         self.get_logger().info("STEP 2: Descending to Grasp Z-Height...")
-        descend_pose = copy.deepcopy(pre_grasp_pose)
-        descend_pose.pose.position.z = safe_z_low 
-        self.moveit2.move_to_pose(descend_pose)
+        self.moveit2.move_to_pose(
+            position=[self.robot_target_x, self.robot_target_y, safe_z_low],
+            quat_xyzw=downward_orientation,
+            frame_id="fr3_link0"
+        )
         if not self.moveit2.wait_until_executed(): return False
 
         # 3. Close gripper and grab cube
         self.get_logger().info("STEP 3: Closing Gripper...")
         self.set_gripper(gripper_closed)
 
-        # 4. Lift up after closing gripper
+        #4. Lift up after closing gripper
         self.get_logger().info("STEP 4: Ascending (Post-Grasp)...")
-        self.moveit2.move_to_pose(pre_grasp_pose) # moves back upto "safety height"
+        self.moveit2.move_to_pose(
+            position=[self.robot_target_x, self.robot_target_y, safe_z_high],
+            quat_xyzw=downward_orientation,
+            frame_id="fr3_link0"
+        ) 
         if not self.moveit2.wait_until_executed(): return False
 
         # PLACE PHASE=================================
-          
+
         # 5. Calculate Target Grid Coordinates
         cell_size_m = 0.05 #TODO Match with irl dims
         board_origin_x = 0.45  # Same as board_offset_x
@@ -152,17 +153,20 @@ class FullPickPlaceNode(Node):
 
         # 6. Motion to place above gridspace ****(row, col)****
         self.get_logger().info(f"STEP 5: Translating to Grid [{row}, {col}]...")
-        pre_place_pose = copy.deepcopy(pre_grasp_pose)
-        pre_place_pose.pose.position.x = place_x
-        pre_place_pose.pose.position.y = place_y
-        self.moveit2.move_to_pose(pre_place_pose)
+        self.moveit2.move_to_pose(
+            position=[place_x, place_y, safe_z_high],
+            quat_xyzw=downward_orientation,
+            frame_id="fr3_link0"
+        )
         if not self.moveit2.wait_until_executed(): return False
 
         # 7. Descend to the table safely
         self.get_logger().info("STEP 6: Descending to Drop Z-Height...")
-        place_pose = copy.deepcopy(pre_place_pose)
-        place_pose.pose.position.z = safe_z_low
-        self.moveit2.move_to_pose(place_pose)
+        self.moveit2.move_to_pose(
+            position=[place_x, place_y, safe_z_low],
+            quat_xyzw=downward_orientation,
+            frame_id="fr3_link0"
+        )
         if not self.moveit2.wait_until_executed(): return False
 
         # 8. Open gripper to release
@@ -171,7 +175,11 @@ class FullPickPlaceNode(Node):
 
         # 9. Lift up after releasing
         self.get_logger().info("STEP 8: Ascending (Post-Place)...")
-        self.moveit2.move_to_pose(pre_place_pose)
+        self.moveit2.move_to_pose(
+            position=[place_x, place_y, safe_z_high],
+            quat_xyzw=downward_orientation,
+            frame_id="fr3_link0"
+        )
         if not self.moveit2.wait_until_executed(): return False
 
         self.get_logger().info("=== Pick and Place Sequence Complete! :) ===")
