@@ -4,7 +4,7 @@ import time
 import rclpy
 from rclpy.node import Node
 from geometry_msgs.msg import PoseStamped
-from pymoveit2.moveit2 import MoveIt2
+from pymoveit2 import MoveIt2
 from rclpy.action import ActionClient
 from control_msgs.action import GripperCommand
 
@@ -145,7 +145,7 @@ class FullPickPlaceNode(Node):
         # PLACE PHASE=================================
 
         # 5. Calculate Target Grid Coordinates
-        cell_size_m = 0.05 #TODO Match with irl dims
+        cell_size_m = 0.0381 #TODO Match with irl dims
         board_origin_x = 0.45  # Same as board_offset_x
         board_origin_y = -0.15 # Same as board_offset_y
         place_x = board_origin_x + (row * cell_size_m) # x = 0.45+2*0.05 = 0.55
@@ -187,13 +187,33 @@ class FullPickPlaceNode(Node):
 
 def main(args=None):
     rclpy.init(args=args)
+    
+    print("\n========================================")
+    print("FR3 Autonomous Pick & Place")
+    print("========================================")
+    try:
+        target_row = int(input("Enter target Row (0 to 5): "))
+        target_col = int(input("Enter target Col (0 to 6): "))
+    except ValueError:
+        print("\n[ERROR] Invalid input. You must enter whole numbers. Exiting.")
+        rclpy.shutdown()
+        return
+
+    print(f"\n[INFO] Target Grid Cells [{target_row}, {target_col}]")
+    print("[INFO] Connecting to hardware...")
+    
+    # 2. Initialize the Node
     node = FullPickPlaceNode()
 
-    # Example: Tell the robot to pick the block and move it to Grid Cell (Row 2, Col 3)
-    # The node will wait here until vision data is received before moving.
-    node.execute_pick_place(row=2, col=3)
+    # 3. Execute the Sequence
+    success = node.execute_pick_place(row=target_row, col=target_col)
 
-    rclpy.spin(node)
+    if success:
+        node.get_logger().info("Sequence finished successfully. Shutting down node.")
+    else:
+        node.get_logger().error("Sequence failed or was aborted.")
+
+    # 4. Clean up
     node.destroy_node()
     rclpy.shutdown()
 
