@@ -53,9 +53,9 @@ def franka_pick_and_place():
         success = pick_place_node.execute_pick_place(row, col)
         
         if success:
-            print("[SUCCESS] Pick-place sequence complete!")
+            node.get_logger().info("Sequence finished successfully. Shutting down node.")
         else:
-            print("[ERROR] Pick-place sequence failed!")
+            node.get_logger().error("Sequence failed or was aborted.")
             
     except KeyboardInterrupt:
         print("\n[INFO] Pick-place cancelled by user.")
@@ -130,6 +130,7 @@ def main():
     except Exception as e:
         print(f"[ERROR] {e}")
     finally:
+        node.destroy_node()
         rclpy.shutdown()
         print("[INFO] ROS2 system shutdown complete")
         print("[INFO] Goodbye!")
