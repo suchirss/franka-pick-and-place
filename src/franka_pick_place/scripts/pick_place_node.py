@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 import copy
+import time
 import rclpy
 from rclpy.node import Node
 from geometry_msgs.msg import PoseStamped
@@ -61,6 +62,7 @@ class FullPickPlaceNode(Node):
         # Send goal and wait (synchronous execution for the state machine)
         future = self.gripper_client.send_goal_async(goal_msg)
         rclpy.spin_until_future_complete(self, future)
+        time.sleep(0.5) # Pause to settle fingers
         return True
 
     def vision_callback(self, msg):
@@ -71,13 +73,12 @@ class FullPickPlaceNode(Node):
         self.target_received = True
         self.get_logger().info("Target acquired from camera! Initiating sequence.")
 
-        # --- THE TAPE-DOWN OFFSETS (IN METERS) ---
+        # --- TAPE-DOWN OFFSETS (IN METERS) ---
         #TODO
-        # UPDATE !! 
         board_offset_x = 0.45   # Distance forward to Marker 15
         board_offset_y = -0.15  # Distance left/right to Marker 15 (Negative = Right)
         
-        # 1. Translate Camera Data (Relative to Board) -> Robot Data (Relative to Base)
+        # 0. Translate Camera Data (Relative to Board) -> Robot Data (Relative to Base)
         self.robot_target_x = msg.pose.position.x + board_offset_x
         self.robot_target_y = msg.pose.position.y + board_offset_y
 
@@ -95,63 +96,95 @@ class FullPickPlaceNode(Node):
             self.get_logger().error("No valid cube position received. Aborting.")
             return False
         
-        # 2. Setup Pre-Grasp Pose (High Z for safety)
+        #TODO - verify
+        # --- CONSTANTS ---
+        safe_z_high = 0.50       # Hover height (50cm) - safety height
+        safe_z_low = 0.02        # Height at which grippers close (2cm) - can increase to 0.10 for first run to avoid hitting table
+        gripper_open = 0.08      # 8cm wide
+        gripper_closed = 0.0381  # 1.5 inches (size of cube) - will close at either this or max effort - see helper action above
+
+        # Ensure gripper is open before starting
+        self.set_gripper(gripper_open)
+        
+        # PICK UP PHASE=================================
+
+        # 1. Setup Pre-Grasp Pose
         pre_grasp_pose = PoseStamped()
         pre_grasp_pose.header.frame_id = "fr3_link0"
-        
         pre_grasp_pose.pose.position.x = self.robot_target_x
         pre_grasp_pose.pose.position.y = self.robot_target_y
-        pre_grasp_pose.pose.position.z = 0.50 # 50cm above the table
-        
+        pre_grasp_pose.pose.position.z = safe_z_high
+
         # Gripper straight down
         pre_grasp_pose.pose.orientation.x = 1.0
         pre_grasp_pose.pose.orientation.y = 0.0
         pre_grasp_pose.pose.orientation.z = 0.0
         pre_grasp_pose.pose.orientation.w = 0.0
 
-        # 3. Execute Pre-Grasp (if pre-grasp successful, can implement other steps)
-        self.get_logger().info(f"Moving to Pre-Grasp: X={self.robot_target_x:.3f}, Y={self.robot_target_y:.3f}")
-        self.moveit2.move_to_pose(pre_grasp_pose)
-        success = self.moveit2.wait_until_executed()
+        self.get_logger().info("STEP 1: Moving to Pre-Grasp...")
+        self.moveit2.move_to_pose(pre_grasp_pose) # if not centered above cube, press e-stop here!
+        if not self.moveit2.wait_until_executed(): return False
 
-        if success:
-            self.get_logger().info("[SUCCESS] Pre-grasp reached. Descending...")
-            
-            # 4. Descend to the table safely
-            safe_z_height = 0.20 
-            # 2cm above the table/base 
-            #TODO # UPDATE HEIGHT TO 2CM AFTER 20CM SAFE TEST
-            
-            descend_pose = copy.deepcopy(pre_grasp_pose)
-            descend_pose.pose.position.z = safe_z_height 
-            
-            self.moveit2.move_to_pose(descend_pose)
-            self.moveit2.wait_until_executed()
-            
-            self.get_logger().info("Ready to close gripper!")
+        # 2. Descend to target
+        self.get_logger().info("STEP 2: Descending to Grasp Z-Height...")
+        descend_pose = copy.deepcopy(pre_grasp_pose)
+        descend_pose.pose.position.z = safe_z_low 
+        self.moveit2.move_to_pose(descend_pose)
+        if not self.moveit2.wait_until_executed(): return False
 
-        else:
-            self.get_logger().error("Pre-grasp failed. Aborting.")
-            return False
+        # 3. Close gripper and grab cube
+        self.get_logger().info("STEP 3: Closing Gripper...")
+        self.set_gripper(gripper_closed)
 
-        #TODO Add close gripper command
+        # 4. Lift up after closing gripper
+        self.get_logger().info("STEP 4: Ascending (Post-Grasp)...")
+        self.moveit2.move_to_pose(pre_grasp_pose) # moves back upto "safety height"
+        if not self.moveit2.wait_until_executed(): return False
 
-        #TODO Add lift up after closing gripper
+        # PLACE PHASE=================================
+          
+        # 5. Calculate Target Grid Coordinates
+        cell_size_m = 0.05 #TODO Match with irl dims
+        board_origin_x = 0.45  # Same as board_offset_x
+        board_origin_y = -0.15 # Same as board_offset_y
+        place_x = board_origin_x + (row * cell_size_m) # x = 0.45+2*0.05 = 0.55
+        place_y = board_origin_y + (col * cell_size_m)  # y = -0.15+3*0.05 = 0
 
-        #TODO Add motion to place above gridspace ****(row, col)****
+        # 6. Motion to place above gridspace ****(row, col)****
+        self.get_logger().info(f"STEP 5: Translating to Grid [{row}, {col}]...")
+        pre_place_pose = copy.deepcopy(pre_grasp_pose)
+        pre_place_pose.pose.position.x = place_x
+        pre_place_pose.pose.position.y = place_y
+        self.moveit2.move_to_pose(pre_place_pose)
+        if not self.moveit2.wait_until_executed(): return False
 
-        #TODO Add descend to the table safely
+        # 7. Descend to the table safely
+        self.get_logger().info("STEP 6: Descending to Drop Z-Height...")
+        place_pose = copy.deepcopy(pre_place_pose)
+        place_pose.pose.position.z = safe_z_low
+        self.moveit2.move_to_pose(place_pose)
+        if not self.moveit2.wait_until_executed(): return False
 
-        #TODO Add open gripper to release
+        # 8. Open gripper to release
+        self.get_logger().info("STEP 7: Opening Gripper (Releasing)...")
+        self.set_gripper(gripper_open)
 
-        #TODO Add lift up after releasing
+        # 9. Lift up after releasing
+        self.get_logger().info("STEP 8: Ascending (Post-Place)...")
+        self.moveit2.move_to_pose(pre_place_pose)
+        if not self.moveit2.wait_until_executed(): return False
 
-        # return true if all steps successful, false if any step failed
+        self.get_logger().info("=== Pick and Place Sequence Complete! :) ===")
         return True
 
 def main(args=None):
     rclpy.init(args=args)
     node = FullPickPlaceNode()
+
+    # Example: Tell the robot to pick the block and move it to Grid Cell (Row 2, Col 3)
+    # The node will wait here until vision data is received before moving.
+    node.execute_pick_place(row=2, col=3)
+
     rclpy.spin(node)
     node.destroy_node()
     rclpy.shutdown()
