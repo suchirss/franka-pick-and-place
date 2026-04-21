@@ -26,6 +26,7 @@ from vision_bridge_node import (
     test_undistortion,
     detect_aruco_grid_and_cube,
     get_config_paths,
+    VisionBridgeNode,
 )
 
 from pick_place_node import FullPickPlaceNode
@@ -47,15 +48,28 @@ def franka_pick_and_place():
             return
         
         print(f"[INFO] Target grid cell: Row {row}, Column {col}")
-        print("[INFO] Initializing pick-place node...")
+        print("[INFO] Starting vision bridge node...")
         
+        # Start vision bridge node to publish cube pose
+        vision_node = VisionBridgeNode()
+        
+        print("[INFO] Initializing pick-place node...")
         pick_place_node = FullPickPlaceNode()
+        
+        # Spin vision node briefly to let it start publishing
+        import threading
+        vision_thread = threading.Thread(target=lambda: rclpy.spin(vision_node), daemon=True)
+        vision_thread.start()
+        
+        import time
+        time.sleep(1.0)  # Give vision node time to start
+        
         success = pick_place_node.execute_pick_place(row, col)
         
         if success:
-            node.get_logger().info("Sequence finished successfully. Shutting down node.")
+            print("[INFO] Sequence finished successfully.")
         else:
-            node.get_logger().error("Sequence failed or was aborted.")
+            print("[ERROR] Sequence failed or was aborted.")
             
     except KeyboardInterrupt:
         print("\n[INFO] Pick-place cancelled by user.")
@@ -63,6 +77,11 @@ def franka_pick_and_place():
         print(f"[ERROR] Pick-place error: {e}")
         import traceback
         traceback.print_exc()
+    finally:
+        if pick_place_node is not None:
+            pick_place_node.destroy_node()
+        if vision_node is not None:
+            vision_node.destroy_node()
 
 
 class UserInterfaceNode(Node):
@@ -74,6 +93,8 @@ class UserInterfaceNode(Node):
 
 
 def main():
+    import sys
+    sys.stdout.reconfigure(line_buffering=True)
     """Main menu loop."""
     print("\n" + "="*50)
     print("  Franka Pick and Place System")
@@ -91,9 +112,11 @@ def main():
             print("3. Test undistortion")
             print("4. Detect cube on ArUco grid")
             print("5. Franka Pick and Place")
-            print("6. Exit")
+            print("6. Save home position")
+            print("7. Move to home position")
+            print("8. Exit")
             
-            choice = input("\nEnter choice (1-6): ").strip()
+            choice = input("\nEnter choice (1-8): ").strip()
 
             if choice == '1':
                 print("\n[ACTION] Capturing calibration images...")
@@ -119,19 +142,49 @@ def main():
                 print("[INFO] Pick and place sequence initiated")
                 
             elif choice == '6':
+                print("\n[ACTION] Saving home position...")
+                try:
+                    pick_place_node = FullPickPlaceNode()
+                    if pick_place_node.save_home_position():
+                        print("[INFO] Home position saved successfully")
+                    else:
+                        print("[ERROR] Failed to save home position")
+                    pick_place_node.destroy_node()
+                except Exception as e:
+                    print(f"[ERROR] Error saving home position: {e}")
+                    import traceback
+                    traceback.print_exc()
+                
+            elif choice == '7':
+                print("\n[ACTION] Moving to home position...")
+                try:
+                    pick_place_node = FullPickPlaceNode()
+                    if pick_place_node.move_to_home_position():
+                        print("[INFO] Move to home position successful")
+                    else:
+                        print("[ERROR] Failed to move to home position")
+                    pick_place_node.destroy_node()
+                except Exception as e:
+                    print(f"[ERROR] Error moving to home position: {e}")
+                    import traceback
+                    traceback.print_exc()
+                    
+            elif choice == '8':
                 print("\n[INFO] Exiting system...")
                 break
                 
             else:
-                print("[WARN] Invalid choice. Please enter 1-6.")
+                print("[WARN] Invalid choice. Please enter 1-8.")
                 
     except KeyboardInterrupt:
         print("\n[INFO] Interrupted by user")
     except Exception as e:
         print(f"[ERROR] {e}")
     finally:
-        node.destroy_node()
-        rclpy.shutdown()
+        if ui_node is not None:
+            ui_node.destroy_node()
+        if rclpy.ok():
+            rclpy.shutdown()
         print("[INFO] ROS2 system shutdown complete")
         print("[INFO] Goodbye!")
 

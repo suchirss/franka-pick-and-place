@@ -114,6 +114,55 @@ def estimate_pose_single_markers(corners, marker_size, camera_matrix, dist_coeff
 
     return np.array(rvecs), np.array(tvecs), marker_points
 
+def normalize_pixel_center(pixel_value):
+    """
+    Convert a projected pixel position into a strict OpenCV-safe (int, int) tuple.
+    Returns None if conversion is not possible.
+    """
+    try:
+        px_raw = np.asarray(pixel_value, dtype=np.float64).reshape(-1)
+        if px_raw.size < 2:
+            return None
+        if not np.isfinite(px_raw[0]) or not np.isfinite(px_raw[1]):
+            return None
+        return (int(round(px_raw[0])), int(round(px_raw[1])))
+    except Exception:
+        return None
+    
+def draw_cube_bottom_marker(frame, pixel_value, label="CUBE BOTTOM"):
+    """
+    Draw a projected cube-bottom marker safely.
+    Returns True if drawn, False otherwise.
+    """
+    px = normalize_pixel_center(pixel_value)
+
+    if px is None:
+        print(f"[DEBUG] draw_cube_bottom_marker: invalid pixel_value={repr(pixel_value)} type={type(pixel_value)}")
+        return False
+
+    try:
+        center_x = int(px[0])
+        center_y = int(px[1])
+        center = (center_x, center_y)
+
+        print(f"[DEBUG] draw_cube_bottom_marker: pixel_value={repr(pixel_value)} -> center={center} types=({type(center_x)}, {type(center_y)})")
+
+        cv2.circle(frame, center, 8, (0, 0, 255), 2)
+        cv2.putText(
+            frame,
+            label,
+            (center_x - 40, center_y - 15),
+            cv2.FONT_HERSHEY_SIMPLEX,
+            0.5,
+            (0, 0, 255),
+            2
+        )
+        return True
+    except Exception as e:
+        print(f"[DEBUG] draw_cube_bottom_marker exception: {e}")
+        print(f"[DEBUG] pixel_value={repr(pixel_value)} type={type(pixel_value)}")
+        print(f"[DEBUG] normalized px={repr(px)} type={type(px)}")
+        return False
 
 class MarkerTracker:
     """Track ArUco marker 3D positions and compute velocities."""
@@ -229,8 +278,11 @@ class CubeCenterTracker:
         estimated_centers = []
         for marker_id, tvec in self.detected_markers.items():
             offset = self.MARKER_OFFSETS[marker_id]
+            # Ensure tvec is 1D before subtraction to avoid broadcasting issues
+            tvec_flat = np.asarray(tvec).flatten()
+            offset_flat = np.asarray(offset).flatten()
             # Cube center = marker position - marker offset
-            estimated_center = tvec - offset
+            estimated_center = tvec_flat - offset_flat
             estimated_centers.append(estimated_center)
         
         if estimated_centers:
@@ -238,7 +290,8 @@ class CubeCenterTracker:
             self.last_cube_center_3d = cube_center
             
             # Return relative to origin
-            relative_center = cube_center - origin_pos
+            origin_pos_flat = np.asarray(origin_pos).flatten()
+            relative_center = cube_center - origin_pos_flat
             return relative_center
         
         return None
@@ -246,33 +299,39 @@ class CubeCenterTracker:
     def project_cube_center_to_pixel(self, cube_center_3d, camera_matrix, dist_coeffs):
         """
         Project the 3D cube center position onto the 2D image plane.
-        
-        Args:
-            cube_center_3d: 3D position of cube center (1x3 or 3x1 array)
-            camera_matrix: Camera intrinsic matrix
-            dist_coeffs: Distortion coefficients
-            
-        Returns:
-            (pixel_x, pixel_y) tuple or None if projection fails
+        Returns (pixel_x, pixel_y) or None.
         """
         if cube_center_3d is None:
             return None
-        
-        points_3d = np.array([cube_center_3d.flatten()], dtype=np.float64)
-        rvec = np.array([0.0, 0.0, 0.0], dtype=np.float64)
-        tvec = np.array([0.0, 0.0, 0.0], dtype=np.float64)
-        
+
         try:
+            cube_center_3d = np.asarray(cube_center_3d, dtype=np.float32).reshape(1, 3)
+            camera_matrix = np.asarray(camera_matrix, dtype=np.float32).reshape(3, 3)
+            dist_coeffs = np.asarray(dist_coeffs, dtype=np.float32).reshape(-1, 1)
+
+            rvec = np.zeros((3, 1), dtype=np.float32)
+            tvec = np.zeros((3, 1), dtype=np.float32)
+
             projected_points, _ = cv2.projectPoints(
-                points_3d, rvec, tvec, camera_matrix, dist_coeffs
+                cube_center_3d,
+                rvec,
+                tvec,
+                camera_matrix,
+                dist_coeffs
             )
+
             pixel_pos = projected_points[0][0]
-            self.last_cube_center_pixel = pixel_pos
-            return float(pixel_pos[0]), float(pixel_pos[1])
+            pixel_tuple = (float(pixel_pos[0]), float(pixel_pos[1]))
+            self.last_cube_center_pixel = pixel_tuple
+            return pixel_tuple
+
         except Exception as e:
             print(f"[ERROR] Failed to project cube center: {e}")
+            print(f"cube_center_3d shape: {np.asarray(cube_center_3d).shape}")
+            print(f"camera_matrix shape: {np.asarray(camera_matrix).shape}")
+            print(f"dist_coeffs shape: {np.asarray(dist_coeffs).shape}")
             return None
-    
+        
     def get_cube_bottom_3d(self, origin_pos):
         """
         Get the 3D position of the cube's bottom center.
@@ -591,11 +650,8 @@ def detect_aruco_grid_and_cube(marker_size_m=MARKER_SIZE_M):
                                    0.7, (0, 0, 255), 2)
                         
                         if cube_tracker.last_cube_center_pixel is not None:
-                            px = cube_tracker.last_cube_center_pixel.astype(int)
-                            cv2.circle(frame, tuple(px), 8, (0, 0, 255), 2)
-                            cv2.putText(frame, "CUBE BOTTOM", (px[0]-40, px[1]-15), 
-                                       cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 2)
-                        
+                            print("[DEBUG] detect_aruco_grid_and_cube drawing cube bottom")
+                            draw_cube_bottom_marker(frame, cube_tracker.last_cube_center_pixel, "CUBE BOTTOM")
                         print(f"CUBE BOTTOM - Grid cell ({cube_grid_cell[0]}, {cube_grid_cell[1]}), " 
                               f"continuous ({cube_grid_pos[0]:.2f}, {cube_grid_pos[1]:.2f})")
 
@@ -674,7 +730,7 @@ class VisionBridgeNode(Node):
             return
 
         cv2.aruco.drawDetectedMarkers(frame, corners, ids)
-        rvecs, tvecs = estimate_pose_single_markers(
+        rvecs, tvecs, _ = estimate_pose_single_markers(
             corners,
             MARKER_SIZE_M,
             self.camera_matrix,
@@ -775,11 +831,8 @@ class VisionBridgeNode(Node):
             
             # Draw the projected cube bottom on the frame
             if self.cube_tracker.last_cube_center_pixel is not None:
-                px = self.cube_tracker.last_cube_center_pixel.astype(int)
-                cv2.circle(frame, tuple(px), 8, (0, 0, 255), 2)  # Red circle for cube bottom
-                cv2.putText(frame, "CUBE BOTTOM", (px[0]-40, px[1]-15), 
-                           cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 2)
-
+                    print("[DEBUG] VisionBridgeNode.process_frame drawing cube bottom")
+                    draw_cube_bottom_marker(frame, self.cube_tracker.last_cube_center_pixel, "CUBE BOTTOM")
         if self.warp_manager.is_calibrated:
             self.warp_manager.draw_grid_overlay(frame)
 
